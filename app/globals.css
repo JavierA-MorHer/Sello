@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #fdf8f8;
+  --paper-2: #f1edec;
+  --paper-3: #ebe7e6;
+  --ink: #1c1b1b;
+  --clay: #a8927e;
+  --clay-light: #b9a390;
+  --error: #ba1a1a;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-clay: var(--clay);
+  --color-clay-light: var(--clay-light);
+  --color-error: var(--error);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), Arial, sans-serif;
+}
+
+/* Ken Burns sutil para fotos de hero — el mismo zoom lento en cualquier
+   foto protagonista (landing, intro de plantilla). */
+@keyframes kenburns {
+  0%, 100% { transform: scale(1.06); }
+  50% { transform: scale(1.14); }
+}
+
+.hero-kenburns {
+  animation: kenburns 22s ease-in-out infinite;
+}
+
+/* Entrada suave para bloques que aparecen sobre el hero o al cargar la
+   página — nunca para contenido ya visible en scroll normal. */
+@keyframes rise-in {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.rise-in {
+  animation: rise-in 0.9s ease-out both;
+}
