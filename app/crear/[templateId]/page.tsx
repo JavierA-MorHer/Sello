@@ -60,7 +60,7 @@ export default async function CrearEventoPage({
     })())
 
   return (
-    <main className="min-h-screen bg-paper px-4 py-16 sm:px-6 sm:py-24">
+    <main className="min-h-screen bg-paper">
       <CrearEventoForm
         eventId={draft.id}
         templateName={template.name}

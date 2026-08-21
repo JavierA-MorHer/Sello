@@ -9,6 +9,7 @@ values (
       {
         "id": "pareja",
         "title": "La pareja",
+        "description": "Así aparecerán en la portada y en el link que compartes.",
         "fields": [
           { "key": "nombre_novia", "label": "Nombre de la novia", "type": "text", "required": true },
           { "key": "nombre_novio", "label": "Nombre del novio", "type": "text", "required": true },
@@ -18,6 +19,7 @@ values (
       {
         "id": "fecha",
         "title": "Fecha y hora",
+        "description": "Se usa para la cuenta regresiva y para ordenar el itinerario.",
         "fields": [
           { "key": "fecha_evento", "label": "Fecha del evento", "type": "date", "required": true },
           { "key": "hora_ceremonia", "label": "Hora de la ceremonia", "type": "time", "required": true }
@@ -26,6 +28,7 @@ values (
       {
         "id": "ceremonia",
         "title": "Ceremonia",
+        "description": "Dónde y a qué hora empieza la ceremonia.",
         "fields": [
           { "key": "ceremonia_lugar", "label": "Nombre del lugar", "type": "text", "required": true },
           { "key": "ceremonia_direccion", "label": "Dirección", "type": "text", "required": true },
@@ -35,6 +38,7 @@ values (
       {
         "id": "recepcion",
         "title": "Recepción",
+        "description": "Dónde sigue la fiesta después de la ceremonia.",
         "fields": [
           { "key": "recepcion_lugar", "label": "Nombre del lugar", "type": "text", "required": true },
           { "key": "recepcion_direccion", "label": "Dirección", "type": "text", "required": true },
@@ -44,6 +48,7 @@ values (
       {
         "id": "itinerario",
         "title": "Itinerario",
+        "description": "Agrega los momentos del día en el orden en que suceden.",
         "fields": [
           {
             "key": "eventos",
@@ -63,6 +68,7 @@ values (
       {
         "id": "mesa_regalos",
         "title": "Mesa de regalos",
+        "description": "Opcional — puedes dejarlo vacío si no quieres incluirla.",
         "fields": [
           {
             "key": "opciones",
@@ -82,6 +88,7 @@ values (
       {
         "id": "rsvp",
         "title": "Confirmación de asistencia",
+        "description": "Así confirmarán tus invitados que van a asistir.",
         "fields": [
           { "key": "fecha_limite_rsvp", "label": "Fecha límite para confirmar", "type": "date" },
           { "key": "mensaje_rsvp", "label": "Mensaje para invitados", "type": "textarea" }

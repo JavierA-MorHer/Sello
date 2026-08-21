@@ -33,6 +33,8 @@ export type Field = TextField | DateField | GroupField | RepeaterField
 export interface FieldSchemaSection {
   id: string
   title: string
+  /** Línea de ayuda mostrada bajo el título del paso en el wizard. Opcional. */
+  description?: string
   fields: Field[]
 }
 
