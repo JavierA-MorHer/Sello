@@ -3,8 +3,6 @@
 import { useState } from 'react'
 import type { FieldSchema } from '@/lib/templates/types'
 import { DynamicForm } from '@/components/forms/DynamicForm'
-import { StampFrame } from '@/components/marketing/StampFrame'
-import { WeddingArchVignette } from '@/components/marketing/WeddingArchVignette'
 import { autosaveDraft } from './actions'
 
 export function CrearEventoForm({
@@ -25,35 +23,20 @@ export function CrearEventoForm({
   if (!started) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center text-center">
-        <p className="font-body text-xs font-semibold tracking-[0.3em] text-kraft/60 uppercase">
+        <p className="font-body text-xs font-semibold tracking-[0.16em] text-ink/50 uppercase">
           Vas a armar
         </p>
 
-        <StampFrame className="mt-6 aspect-[4/5] w-56 bg-kraft shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
-          <div className="flex h-full flex-col p-5 text-kraft-ink">
-            <div className="flex items-center justify-between font-body text-[9px] font-semibold tracking-[0.25em]">
-              <span>SELLO</span>
-              <span>MÉXICO</span>
-            </div>
-            <div className="flex flex-1 items-center justify-center px-2 py-1 text-kraft-ink/80">
-              <WeddingArchVignette className="h-full w-full" />
-            </div>
-            <div className="flex items-end justify-between">
-              <span className="font-display text-base leading-tight font-bold">
-                {templateName}
-              </span>
-              <div className="text-right font-display">
-                <div className="text-sm leading-none font-bold">{priceRange}</div>
-                <div className="text-[8px] tracking-[0.2em]">MXN</div>
-              </div>
-            </div>
-          </div>
-        </StampFrame>
+        <div className="mt-6 flex aspect-[5/7] w-56 flex-col items-center justify-center gap-3 rounded-sm border border-clay/40 bg-paper-2 px-6 text-center">
+          <span className="font-display text-xl leading-tight">{templateName}</span>
+          <div className="h-px w-6 bg-ink/20" />
+          <span className="font-body text-xs font-semibold tracking-[0.14em] text-ink/60 uppercase">
+            {priceRange}
+          </span>
+        </div>
 
-        <h1 className="mt-8 font-display text-3xl font-bold text-kraft">
-          {templateName}
-        </h1>
-        <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-kraft/70">
+        <h1 className="mt-8 font-display text-3xl">{templateName}</h1>
+        <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-ink/60">
           Llena tus datos con autosave — puedes cerrar el navegador y retomar
           después. Verás una vista previa con marca de agua antes de pagar.
         </p>
@@ -61,7 +44,7 @@ export function CrearEventoForm({
         <button
           type="button"
           onClick={() => setStarted(true)}
-          className="stamp-button mt-9 rounded-sm bg-vermilion-dark px-8 py-4 font-body text-base font-semibold text-kraft"
+          className="mt-9 rounded-sm bg-ink px-8 py-4 font-body text-base font-semibold text-paper transition-colors hover:bg-clay"
         >
           Comenzar a llenar →
         </button>
@@ -71,9 +54,7 @@ export function CrearEventoForm({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-8 font-display text-2xl font-bold text-kraft">
-        {templateName}
-      </h1>
+      <h1 className="mb-8 font-display text-2xl">{templateName}</h1>
       <DynamicForm
         schema={schema}
         defaultValues={defaultValues}

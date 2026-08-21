@@ -13,10 +13,10 @@ function SaveStatusLine({ status }: { status: SaveStatus }) {
   if (status === 'idle') return null
 
   return (
-    <p className="flex items-center gap-2 font-body text-sm text-kraft-ink/80">
+    <p className="flex items-center gap-2 font-body text-sm text-ink/70">
       {status === 'saving' && (
         <>
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-vermilion-dark" />
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-clay" />
           Guardando…
         </>
       )}
@@ -24,7 +24,7 @@ function SaveStatusLine({ status }: { status: SaveStatus }) {
         <>
           <svg
             viewBox="0 0 16 16"
-            className="h-4 w-4 text-vermilion-dark"
+            className="h-4 w-4 text-clay"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.8"
@@ -38,7 +38,7 @@ function SaveStatusLine({ status }: { status: SaveStatus }) {
         </>
       )}
       {status === 'error' && (
-        <span className="text-vermilion-dark">
+        <span className="text-error">
           No se pudo guardar — revisa tu conexión
         </span>
       )}
@@ -80,15 +80,15 @@ export function DynamicForm({
   }, [watch, onAutosave])
 
   return (
-    <form className="kraft-texture rounded-sm bg-kraft p-6 text-kraft-ink shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] sm:p-10">
-      <div className="relative z-10 flex flex-col gap-10">
+    <form className="rounded-sm border border-ink/8 bg-paper p-6 text-ink sm:p-10">
+      <div className="flex flex-col gap-10">
         {schema.sections.map((section, i) => (
           <section key={section.id} className="flex flex-col gap-5">
-            <div className="flex items-baseline gap-3 border-b border-kraft-ink/15 pb-3">
-              <span className="font-body text-xs font-semibold text-kraft-ink/70">
+            <div className="flex items-baseline gap-3 border-b border-ink/10 pb-3">
+              <span className="font-body text-xs font-semibold text-ink/50">
                 {String(i + 1).padStart(2, '0')}
               </span>
-              <h2 className="font-display text-2xl font-bold">{section.title}</h2>
+              <h2 className="font-display text-2xl">{section.title}</h2>
             </div>
             <div className="flex flex-col gap-5">
               {section.fields.map((field) => (

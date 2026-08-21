@@ -60,15 +60,15 @@ function LoginContent() {
   }
 
   return (
-    <main className="ink-texture flex min-h-screen items-center justify-center px-4 py-16">
-      <div className="relative z-10 w-full max-w-sm">
-        <p className="text-center font-display text-2xl font-bold text-kraft">SELLO</p>
+    <main className="flex min-h-screen items-center justify-center bg-paper px-4 py-16">
+      <div className="w-full max-w-sm">
+        <p className="text-center font-display text-2xl">Sello</p>
 
-        <div className="kraft-texture mt-8 rounded-sm bg-kraft p-8 text-kraft-ink shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)]">
-          <div className="relative z-10 flex flex-col gap-6">
+        <div className="mt-8 rounded-sm border border-ink/8 bg-paper p-8 text-ink">
+          <div className="flex flex-col gap-6">
             <div>
-              <h1 className="font-display text-2xl font-bold">Inicia sesión</h1>
-              <p className="mt-2 font-body text-sm text-kraft-ink/70">
+              <h1 className="font-display text-2xl">Inicia sesión</h1>
+              <p className="mt-2 font-body text-sm text-ink/60">
                 Para armar y guardar tu invitación necesitas una cuenta.
               </p>
             </div>
@@ -76,20 +76,20 @@ function LoginContent() {
             <button
               type="button"
               onClick={handleGoogle}
-              className="flex items-center justify-center gap-3 rounded-sm border border-kraft-ink/20 bg-white py-3 font-body text-sm font-semibold text-kraft-ink transition-colors hover:border-kraft-ink/40"
+              className="flex items-center justify-center gap-3 rounded-sm border border-ink/15 bg-paper py-3 font-body text-sm font-semibold text-ink transition-colors hover:border-ink/30"
             >
               <GoogleIcon />
               Continuar con Google
             </button>
 
-            <div className="flex items-center gap-3 font-body text-[9px] font-semibold tracking-[0.15em] text-kraft-ink/70">
-              <div className="h-px flex-1 bg-kraft-ink/15" />
+            <div className="flex items-center gap-3 font-body text-[9px] font-semibold tracking-[0.15em] text-ink/50">
+              <div className="h-px flex-1 bg-ink/10" />
               O CON TU CORREO
-              <div className="h-px flex-1 bg-kraft-ink/15" />
+              <div className="h-px flex-1 bg-ink/10" />
             </div>
 
             {status === 'sent' ? (
-              <p className="font-body text-sm text-kraft-ink/80">
+              <p className="font-body text-sm text-ink/70">
                 Te enviamos un enlace a <strong>{email}</strong>. Ábrelo desde
                 este mismo navegador.
               </p>
@@ -101,17 +101,17 @@ function LoginContent() {
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="border-0 border-b-2 border-kraft-ink/25 bg-transparent px-0.5 py-1.5 font-body text-base text-kraft-ink outline-none transition-colors placeholder:text-kraft-ink/30 focus:border-vermilion-dark"
+                  className="rounded-sm border border-ink/15 bg-paper px-3.5 py-3 font-body text-base text-ink outline-none transition-colors placeholder:text-ink/30 focus:border-clay"
                 />
                 <button
                   type="submit"
                   disabled={status === 'sending'}
-                  className="stamp-button rounded-sm bg-vermilion-dark px-4 py-2.5 font-body text-sm font-semibold text-kraft disabled:opacity-50"
+                  className="rounded-sm bg-ink px-4 py-2.5 font-body text-sm font-semibold text-paper transition-colors hover:bg-clay disabled:opacity-50"
                 >
                   {status === 'sending' ? 'Enviando…' : 'Enviar enlace mágico'}
                 </button>
                 {status === 'error' && (
-                  <p className="font-body text-sm text-vermilion-dark">
+                  <p className="font-body text-sm text-error">
                     Algo falló al enviar el enlace. Intenta de nuevo.
                   </p>
                 )}

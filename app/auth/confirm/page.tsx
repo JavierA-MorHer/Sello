@@ -10,10 +10,10 @@ export default async function ConfirmPage({
 
   if (!token_hash || !type) {
     return (
-      <main className="ink-texture flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center">
-        <div className="relative z-10 flex flex-col items-center gap-4">
-          <h1 className="font-display text-2xl font-bold text-kraft">Enlace inválido</h1>
-          <p className="font-body text-kraft/70">
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-paper px-4 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <h1 className="font-display text-2xl">Enlace inválido</h1>
+          <p className="font-body text-ink/70">
             Pide un enlace nuevo desde la página de inicio de sesión.
           </p>
         </div>
@@ -22,10 +22,10 @@ export default async function ConfirmPage({
   }
 
   return (
-    <main className="ink-texture flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center">
-      <div className="relative z-10 flex max-w-sm flex-col items-center gap-4">
-        <h1 className="font-display text-2xl font-bold text-kraft">Confirmar acceso</h1>
-        <p className="font-body text-sm text-kraft/70">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-paper px-4 text-center">
+      <div className="flex max-w-sm flex-col items-center gap-4">
+        <h1 className="font-display text-2xl">Confirmar acceso</h1>
+        <p className="font-body text-sm text-ink/70">
           Por seguridad pedimos un clic extra aquí — algunos correos (como
           Gmail) visitan los enlaces automáticamente antes de que los abras.
         </p>

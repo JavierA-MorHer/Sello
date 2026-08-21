@@ -60,16 +60,14 @@ export default async function CrearEventoPage({
     })())
 
   return (
-    <main className="ink-texture min-h-screen bg-ink px-4 py-16 sm:px-6 sm:py-24">
-      <div className="relative z-10">
-        <CrearEventoForm
-          eventId={draft.id}
-          templateName={template.name}
-          priceRange={getPriceRangeForCategory(template.category)}
-          schema={template.field_schema as FieldSchema}
-          defaultValues={draft.custom_data as Record<string, unknown>}
-        />
-      </div>
+    <main className="min-h-screen bg-paper px-4 py-16 sm:px-6 sm:py-24">
+      <CrearEventoForm
+        eventId={draft.id}
+        templateName={template.name}
+        priceRange={getPriceRangeForCategory(template.category)}
+        schema={template.field_schema as FieldSchema}
+        defaultValues={draft.custom_data as Record<string, unknown>}
+      />
     </main>
   )
 }

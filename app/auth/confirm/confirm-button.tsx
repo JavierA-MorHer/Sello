@@ -19,7 +19,7 @@ export function ConfirmButton({
     <button
       disabled={isPending}
       onClick={() => startTransition(() => confirmMagicLink(tokenHash, type, next))}
-      className="stamp-button rounded-sm bg-vermilion-dark px-6 py-3 font-body text-sm font-semibold text-kraft disabled:opacity-50"
+      className="rounded-sm bg-ink px-6 py-3 font-body text-sm font-semibold text-paper transition-colors hover:bg-clay disabled:opacity-50"
     >
       {isPending ? 'Confirmando…' : 'Confirmar acceso'}
     </button>

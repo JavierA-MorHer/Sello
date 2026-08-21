@@ -28,17 +28,6 @@ body {
   font-family: var(--font-body), Arial, sans-serif;
 }
 
-/* Ken Burns sutil para fotos de hero — el mismo zoom lento en cualquier
-   foto protagonista (landing, intro de plantilla). */
-@keyframes kenburns {
-  0%, 100% { transform: scale(1.06); }
-  50% { transform: scale(1.14); }
-}
-
-.hero-kenburns {
-  animation: kenburns 22s ease-in-out infinite;
-}
-
 /* Entrada suave para bloques que aparecen sobre el hero o al cargar la
    página — nunca para contenido ya visible en scroll normal. */
 @keyframes rise-in {
@@ -46,6 +35,8 @@ body {
   100% { opacity: 1; transform: translateY(0); }
 }
 
-.rise-in {
-  animation: rise-in 0.9s ease-out both;
+@media (prefers-reduced-motion: no-preference) {
+  .rise-in {
+    animation: rise-in 0.9s ease-out both;
+  }
 }

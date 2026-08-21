@@ -15,10 +15,30 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const TITLE = "Sello — invitaciones digitales que funcionan de verdad";
+const DESCRIPTION =
+  "Arma tu invitación de boda, XV años, bautizo o baby shower en minutos. Contestas unas preguntas y tu invitación queda lista para compartir por WhatsApp, con confirmación de asistencia real.";
+
 export const metadata: Metadata = {
-  title: "Sello — invitaciones digitales que funcionan de verdad",
-  description:
-    "Arma tu invitación de boda, XV años o bautizo en minutos. Contestas unas preguntas y tu invitación queda lista para compartir por WhatsApp, con confirmación de asistencia real.",
+  metadataBase: new URL(APP_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "/",
+    siteName: "Sello",
+    locale: "es_MX",
+    type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Sello — invitaciones digitales" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

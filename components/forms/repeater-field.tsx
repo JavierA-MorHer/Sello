@@ -18,23 +18,23 @@ export function RepeaterField({
   const canRemove = fields.length > (field.min ?? 0)
 
   return (
-    <fieldset className="flex flex-col gap-4 rounded-sm border border-kraft-ink/15 p-4 sm:p-5">
-      <legend className="px-1 font-display text-base font-bold">{field.label}</legend>
+    <fieldset className="flex flex-col gap-4 rounded-sm border border-ink/10 p-4 sm:p-5">
+      <legend className="px-1 font-display text-base">{field.label}</legend>
 
       {fields.map((item, index) => (
         <div
           key={item.id}
-          className="flex flex-col gap-4 rounded-sm border border-kraft-ink/10 bg-kraft-2/40 p-4"
+          className="flex flex-col gap-4 rounded-sm border border-ink/8 bg-paper-3/50 p-4"
         >
           <div className="flex items-center justify-between">
-            <span className="font-body text-xs font-semibold tracking-[0.1em] text-kraft-ink/90 uppercase">
+            <span className="font-body text-xs font-semibold tracking-[0.1em] text-ink/70 uppercase">
               {field.itemLabel ?? 'Item'} {index + 1}
             </span>
             {canRemove && (
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="font-body text-xs font-semibold tracking-wide text-vermilion-dark underline decoration-vermilion-dark/40 underline-offset-2 hover:text-vermilion"
+                className="font-body text-xs font-semibold tracking-wide text-error underline decoration-error/40 underline-offset-2 hover:decoration-error"
               >
                 Eliminar
               </button>
@@ -56,7 +56,7 @@ export function RepeaterField({
         <button
           type="button"
           onClick={() => append({})}
-          className="self-start rounded-sm border border-kraft-ink/30 px-4 py-2 font-body text-sm font-semibold text-kraft-ink transition-colors hover:border-vermilion-dark hover:text-vermilion-dark"
+          className="self-start rounded-sm border border-ink/20 px-4 py-2 font-body text-sm font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
         >
           + Agregar {field.itemLabel ?? 'item'}
         </button>
