@@ -26,7 +26,7 @@ export default async function EventoPublicoPage({
 
   const { data: event } = await supabase
     .from('events')
-    .select('status, template_id, custom_data')
+    .select('id, status, template_id, custom_data')
     .eq('slug', slug)
     .maybeSingle()
 
@@ -52,5 +52,5 @@ export default async function EventoPublicoPage({
 
   const { fotos, ...custom_data } = event.custom_data as WeddingData & { fotos?: string[] }
 
-  return <TemplateComponent custom_data={custom_data} fotos={fotos} />
+  return <TemplateComponent custom_data={custom_data} fotos={fotos} eventId={event.id} />
 }

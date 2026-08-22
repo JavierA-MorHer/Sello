@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { TEMPLATE_COMPONENTS } from '@/lib/templates/registry'
 import type { WeddingData } from '@/components/templates/wedding.types'
+import type { FieldSchema } from '@/lib/templates/types'
 import { PreviewWatermark } from '@/components/preview/PreviewWatermark'
 
 export default async function PreviewPage({
@@ -27,7 +28,7 @@ export default async function PreviewPage({
 
   const { data: template } = await supabase
     .from('templates')
-    .select('component_key')
+    .select('component_key, field_schema')
     .eq('id', templateId)
     .single()
 
@@ -54,6 +55,7 @@ export default async function PreviewPage({
   }
 
   const { fotos, ...custom_data } = draft.custom_data as WeddingData & { fotos?: string[] }
+  const reviewStepIndex = (template.field_schema as FieldSchema).sections.length
 
   return (
     <div className="min-h-screen bg-paper">
@@ -67,19 +69,18 @@ export default async function PreviewPage({
         <span className="font-body text-[11px] font-semibold tracking-[0.1em] text-paper/60 uppercase">
           Vista previa · sin publicar
         </span>
-        <button
-          type="button"
-          disabled
-          title="Disponible cuando el pago esté activo"
-          className="cursor-not-allowed rounded-sm bg-clay/50 px-3.5 py-2 font-body text-xs font-semibold text-paper/70"
+        <Link
+          href={`/crear/${templateId}?paso=${reviewStepIndex}`}
+          className="rounded-sm bg-clay px-3.5 py-2 font-body text-xs font-semibold text-paper transition-colors hover:bg-clay-light"
         >
           Publicar
-        </button>
+        </Link>
       </div>
 
       <div className="relative">
         <PreviewWatermark />
-        <TemplateComponent custom_data={custom_data} fotos={fotos} />
+        {/* eventId=null: el RSVP queda deshabilitado en modo preview (ver ARCHITECTURE.md §8). */}
+        <TemplateComponent custom_data={custom_data} fotos={fotos} eventId={null} />
       </div>
     </div>
   )

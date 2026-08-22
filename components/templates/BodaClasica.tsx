@@ -40,9 +40,11 @@ const bodyFont = { fontFamily: 'var(--font-tpl-body)' }
 export function BodaClasica({
   custom_data,
   fotos = [],
+  eventId = null,
 }: {
   custom_data: WeddingData
   fotos?: string[]
+  eventId?: string | null
 }) {
   const d = custom_data
   const portada = fotos[0] ?? '/demo/boda-placeholder.jpg'
@@ -257,7 +259,7 @@ export function BodaClasica({
         <h2 style={displayFont} className="mt-3 mb-12 text-center text-3xl text-[#f5efe4] sm:text-4xl">
           RSVP
         </h2>
-        <RsvpForm fechaLimite={formatCorto(d.fecha_limite_rsvp)} mensaje={d.mensaje_rsvp} />
+        <RsvpForm eventId={eventId} fechaLimite={formatCorto(d.fecha_limite_rsvp)} mensaje={d.mensaje_rsvp} />
       </section>
 
       {/* CIERRE */}
