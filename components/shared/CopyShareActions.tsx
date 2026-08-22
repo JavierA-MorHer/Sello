@@ -30,18 +30,18 @@ export function CopyShareActions({ link, eventName }: { link: string; eventName?
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap justify-center gap-3">
       <button
         type="button"
         onClick={handleCopy}
-        className="rounded-sm border border-ink/20 px-5 py-3 font-body text-sm font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
+        className="rounded-sm border border-ink/20 px-7 py-3.5 font-body text-sm font-semibold whitespace-nowrap text-ink transition-colors hover:border-clay hover:text-clay"
       >
         {copied ? 'Copiado ✓' : 'Copiar link'}
       </button>
       <button
         type="button"
         onClick={handleShare}
-        className="rounded-sm bg-ink px-5 py-3 font-body text-sm font-semibold text-paper transition-colors hover:bg-clay"
+        className="rounded-sm bg-ink px-7 py-3.5 font-body text-sm font-semibold whitespace-nowrap text-paper transition-colors hover:bg-clay"
       >
         Compartir
       </button>
