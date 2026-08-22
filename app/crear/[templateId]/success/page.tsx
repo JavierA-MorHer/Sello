@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/server'
+import { AppMenu } from '@/components/nav/AppMenu'
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
 
@@ -56,7 +57,11 @@ export default async function CheckoutSuccessPage({
   const link = slug ? `https://${slug}.${ROOT_DOMAIN}` : null
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-paper px-6 py-16 text-center">
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-6 bg-paper px-6 py-16 text-center">
+      <div className="absolute top-4 right-4">
+        <AppMenu />
+      </div>
+
       <span className="flex h-20 w-20 items-center justify-center rounded-full border border-clay/50 bg-clay/10 font-display text-3xl text-clay">
         S
       </span>

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import type { Field, FieldSchema } from '@/lib/templates/types'
 import { DynamicForm } from '@/components/forms/DynamicForm'
+import { AppMenu } from '@/components/nav/AppMenu'
 import { autosaveDraft, createCheckoutSession } from './actions'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
@@ -167,13 +168,16 @@ export function CrearEventoForm({
       <div className="sticky top-0 z-10 border-b border-ink/8 bg-paper/95 px-4 pt-4 pb-3 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-2xl flex-col gap-3">
           <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => (stepIndex === 0 ? router.push('/plantillas') : goToStep(stepIndex - 1))}
-              className="font-body text-sm font-semibold text-ink/70 transition-colors hover:text-ink"
-            >
-              ← Atrás
-            </button>
+            <div className="flex items-center gap-1">
+              <AppMenu />
+              <button
+                type="button"
+                onClick={() => (stepIndex === 0 ? router.push('/plantillas') : goToStep(stepIndex - 1))}
+                className="font-body text-sm font-semibold text-ink/70 transition-colors hover:text-ink"
+              >
+                ← Atrás
+              </button>
+            </div>
             <span className="font-body text-[11px] font-semibold tracking-[0.1em] text-ink/50 uppercase">
               Paso {stepIndex + 1} de {totalSteps}
             </span>

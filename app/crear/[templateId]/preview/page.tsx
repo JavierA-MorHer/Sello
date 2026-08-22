@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { TEMPLATE_COMPONENTS } from '@/lib/templates/registry'
 import type { FieldSchema } from '@/lib/templates/types'
 import { PreviewWatermark } from '@/components/preview/PreviewWatermark'
+import { AppMenu } from '@/components/nav/AppMenu'
 
 export default async function PreviewPage({
   params,
@@ -59,12 +60,15 @@ export default async function PreviewPage({
   return (
     <div className="min-h-screen bg-paper">
       <div className="sticky top-0 z-30 flex items-center justify-between bg-ink px-4 py-3.5 sm:px-6">
-        <Link
-          href={editHref}
-          className="font-body text-sm font-semibold text-paper/85 transition-colors hover:text-paper"
-        >
-          ← Editar
-        </Link>
+        <div className="flex items-center gap-1">
+          <AppMenu variant="dark" />
+          <Link
+            href={editHref}
+            className="font-body text-sm font-semibold text-paper/85 transition-colors hover:text-paper"
+          >
+            ← Editar
+          </Link>
+        </div>
         <span className="font-body text-[11px] font-semibold tracking-[0.1em] text-paper/60 uppercase">
           Vista previa · sin publicar
         </span>

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getEventTitle } from '@/lib/templates/summary'
 import { getPriceMXNForCategory } from '@/lib/templates/pricing'
+import { AppMenu } from '@/components/nav/AppMenu'
 
 const STATUS_ORDER = ['draft', 'active', 'expiring_soon', 'expired', 'archived'] as const
 
@@ -46,10 +47,15 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen bg-paper px-4 py-16 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-5xl">
-        <h1 className="font-display text-3xl">Panel de admin</h1>
-        <p className="mt-2 font-body text-sm text-ink/60">
-          Métricas agregadas — {events?.length ?? 0} eventos en total.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl">Panel de admin</h1>
+            <p className="mt-2 font-body text-sm text-ink/60">
+              Métricas agregadas — {events?.length ?? 0} eventos en total.
+            </p>
+          </div>
+          <AppMenu isAdmin />
+        </div>
 
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
           {STATUS_ORDER.map((status) => (

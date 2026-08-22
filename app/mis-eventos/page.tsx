@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SignOutButton } from '@/components/auth/SignOutButton'
+import { AppMenu } from '@/components/nav/AppMenu'
 import { getEventTitle } from '@/lib/templates/summary'
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
@@ -46,15 +46,24 @@ export default async function MisEventosPage() {
 
   const templateById = new Map((templates ?? []).map((t) => [t.id, t]))
 
+  const metadataName =
+    typeof user.user_metadata?.full_name === 'string'
+      ? user.user_metadata.full_name
+      : typeof user.user_metadata?.name === 'string'
+        ? user.user_metadata.name
+        : null
+  const displayName = metadataName ?? user.email?.split('@')[0] ?? 'de nuevo'
+  const isAdmin = user.app_metadata?.role === 'admin'
+
   return (
     <main className="min-h-screen bg-paper px-4 py-16 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-4xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-body text-sm text-ink/60">Sesión iniciada como {user.email}.</p>
+            <p className="font-body text-sm text-ink/60">Hola, {displayName}.</p>
             <h1 className="mt-3 font-display text-3xl sm:text-4xl">Mis eventos</h1>
           </div>
-          <SignOutButton />
+          <AppMenu displayName={displayName} isAdmin={isAdmin} />
         </div>
 
         {events && events.length > 0 ? (
