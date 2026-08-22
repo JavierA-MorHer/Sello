@@ -2,6 +2,7 @@ import { Italiana, Work_Sans, Beau_Rivage } from 'next/font/google'
 import { TemplatePhoto } from './TemplatePhoto'
 import { RsvpForm } from './RsvpForm'
 import type { WeddingData } from './wedding.types'
+import { buildMapsSearchUrl } from '@/lib/text/maps'
 
 const display = Italiana({ weight: '400', subsets: ['latin'], variable: '--font-tpl-display' })
 const script = Beau_Rivage({ weight: '400', subsets: ['latin'], variable: '--font-tpl-script' })
@@ -28,7 +29,10 @@ function formatCorto(iso?: string) {
   return new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long' }).format(date)
 }
 
-const displayFont = { fontFamily: 'var(--font-tpl-display)' }
+// Italiana solo existe en peso 400 (sin variante bold) y sus trazos finos se
+// pierden en textos medianos/pequeños sobre el marfil de fondo — un trazo
+// sutil de contorno compensa el peso sin cambiar la tipografía.
+const displayFont = { fontFamily: 'var(--font-tpl-display)', WebkitTextStroke: '0.4px currentColor' }
 const scriptFont = { fontFamily: 'var(--font-tpl-script)' }
 const bodyFont = { fontFamily: 'var(--font-tpl-body)' }
 
@@ -40,7 +44,11 @@ export function BodaClasica({
   fotos?: string[]
 }) {
   const d = custom_data
-  const galeria = fotos.length > 0 ? fotos : []
+  const portada = fotos[0] ?? '/demo/boda-placeholder.jpg'
+  // La primera foto ya se usa como portada del hero — la galería muestra el resto.
+  const galeria = fotos.slice(1)
+  const ceremoniaMapaUrl = buildMapsSearchUrl(d.ceremonia_lugar, d.ceremonia_direccion)
+  const recepcionMapaUrl = buildMapsSearchUrl(d.recepcion_lugar, d.recepcion_direccion)
 
   return (
     <div
@@ -49,13 +57,7 @@ export function BodaClasica({
     >
       {/* HERO */}
       <section className="relative flex min-h-screen items-end justify-center overflow-hidden">
-        <TemplatePhoto
-          src="/demo/boda-placeholder.jpg"
-          alt=""
-          priority
-          sizes="100vw"
-          className="absolute inset-0"
-        />
+        <TemplatePhoto src={portada} alt="" priority sizes="100vw" className="absolute inset-0" />
         <div
           className="absolute inset-0"
           style={{
@@ -93,7 +95,7 @@ export function BodaClasica({
 
       {/* DETALLES */}
       <section className="border-t border-[#1c2333]/10 px-6 py-20 sm:py-28">
-        <p style={bodyFont} className="text-center text-xs tracking-[0.3em] text-[#1c2333]/50 uppercase">
+        <p style={bodyFont} className="text-center text-xs tracking-[0.3em] font-semibold text-[#1c2333]/60 uppercase">
           Los detalles
         </p>
         <h2 style={displayFont} className="mt-3 text-center text-3xl sm:text-4xl">
@@ -102,18 +104,20 @@ export function BodaClasica({
 
         <div className="mx-auto mt-14 grid max-w-3xl gap-10 sm:grid-cols-2">
           <div className="text-center">
-            <p style={bodyFont} className="text-xs tracking-[0.2em] text-[#1c2333]/50 uppercase">
-              Ceremonia · {d.hora_ceremonia}
+            <p style={bodyFont} className="text-xs tracking-[0.2em] font-semibold text-[#1c2333]/60 uppercase">
+              Ceremonia{d.hora_ceremonia ? ` · ${d.hora_ceremonia}` : ''}
             </p>
             <p style={displayFont} className="mt-3 text-2xl">
               {d.ceremonia_lugar}
             </p>
-            <p style={bodyFont} className="mt-2 text-sm text-[#1c2333]/70">
+            <p style={bodyFont} className="mt-2 text-sm text-[#1c2333]/85">
               {d.ceremonia_direccion}
             </p>
-            {d.ceremonia_mapa_url && (
+            {ceremoniaMapaUrl && (
               <a
-                href={d.ceremonia_mapa_url}
+                href={ceremoniaMapaUrl}
+                target="_blank"
+                rel="noreferrer"
                 style={bodyFont}
                 className="mt-3 inline-block text-xs tracking-[0.15em] text-[#1c2333] underline decoration-[#1c2333]/30 underline-offset-4 uppercase"
               >
@@ -123,18 +127,20 @@ export function BodaClasica({
           </div>
 
           <div className="text-center">
-            <p style={bodyFont} className="text-xs tracking-[0.2em] text-[#1c2333]/50 uppercase">
+            <p style={bodyFont} className="text-xs tracking-[0.2em] font-semibold text-[#1c2333]/60 uppercase">
               Recepción
             </p>
             <p style={displayFont} className="mt-3 text-2xl">
               {d.recepcion_lugar}
             </p>
-            <p style={bodyFont} className="mt-2 text-sm text-[#1c2333]/70">
+            <p style={bodyFont} className="mt-2 text-sm text-[#1c2333]/85">
               {d.recepcion_direccion}
             </p>
-            {d.recepcion_mapa_url && (
+            {recepcionMapaUrl && (
               <a
-                href={d.recepcion_mapa_url}
+                href={recepcionMapaUrl}
+                target="_blank"
+                rel="noreferrer"
                 style={bodyFont}
                 className="mt-3 inline-block text-xs tracking-[0.15em] text-[#1c2333] underline decoration-[#1c2333]/30 underline-offset-4 uppercase"
               >
@@ -148,27 +154,27 @@ export function BodaClasica({
       {/* ITINERARIO */}
       {d.eventos && d.eventos.length > 0 && (
         <section className="border-t border-[#1c2333]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs tracking-[0.3em] text-[#1c2333]/50 uppercase">
+          <p style={bodyFont} className="text-center text-xs tracking-[0.3em] font-semibold text-[#1c2333]/60 uppercase">
             El programa
           </p>
           <h2 style={displayFont} className="mt-3 text-center text-3xl sm:text-4xl">
             Itinerario
           </h2>
 
-          <div className="relative mx-auto mt-14 max-w-md">
+          <div className="relative mx-auto mt-14 w-fit max-w-full">
             <div className="absolute top-1 bottom-1 left-[3px] w-px bg-[#1c2333]/15" />
             <div className="flex flex-col gap-10">
               {d.eventos.map((evento, i) => (
                 <div key={i} className="relative pl-8">
                   <div className="absolute top-1.5 left-0 h-2 w-2 rounded-full bg-[#1c2333]" />
-                  <p style={bodyFont} className="text-xs tracking-[0.15em] text-[#1c2333]/50 uppercase">
+                  <p style={bodyFont} className="text-xs tracking-[0.15em] font-semibold text-[#1c2333]/60 uppercase">
                     {evento.hora}
                   </p>
                   <p style={displayFont} className="mt-1 text-xl">
                     {evento.titulo}
                   </p>
                   {evento.descripcion && (
-                    <p style={bodyFont} className="mt-1 text-sm text-[#1c2333]/70">
+                    <p style={bodyFont} className="mt-1 text-sm text-[#1c2333]/85">
                       {evento.descripcion}
                     </p>
                   )}
@@ -182,7 +188,7 @@ export function BodaClasica({
       {/* GALERIA */}
       {galeria.length > 0 && (
         <section className="border-t border-[#1c2333]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs tracking-[0.3em] text-[#1c2333]/50 uppercase">
+          <p style={bodyFont} className="text-center text-xs tracking-[0.3em] font-semibold text-[#1c2333]/60 uppercase">
             Momentos
           </p>
           <h2 style={displayFont} className="mt-3 mb-14 text-center text-3xl sm:text-4xl">
@@ -206,13 +212,13 @@ export function BodaClasica({
       {/* MESA DE REGALOS */}
       {d.opciones && d.opciones.length > 0 && (
         <section className="border-t border-[#1c2333]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs tracking-[0.3em] text-[#1c2333]/50 uppercase">
+          <p style={bodyFont} className="text-center text-xs tracking-[0.3em] font-semibold text-[#1c2333]/60 uppercase">
             Con cariño
           </p>
           <h2 style={displayFont} className="mt-3 text-center text-3xl sm:text-4xl">
             Mesa de regalos
           </h2>
-          <p style={bodyFont} className="mx-auto mt-4 max-w-sm text-center text-sm text-[#1c2333]/70">
+          <p style={bodyFont} className="mx-auto mt-4 max-w-sm text-center text-sm text-[#1c2333]/85">
             Tu presencia es nuestro mejor regalo. Si aún así quieres tener un
             detalle con nosotros, aquí puedes encontrarnos.
           </p>
@@ -220,19 +226,14 @@ export function BodaClasica({
           <div className="mx-auto mt-10 flex max-w-md flex-col divide-y divide-[#1c2333]/10">
             {d.opciones.map((op, i) => (
               <div key={i} className="flex items-center justify-between py-4">
-                <div>
-                  <p style={displayFont} className="text-lg">
-                    {op.tienda}
-                  </p>
-                  {op.numero_mesa && (
-                    <p style={bodyFont} className="text-xs text-[#1c2333]/50">
-                      Mesa {op.numero_mesa}
-                    </p>
-                  )}
-                </div>
+                <p style={displayFont} className="text-lg">
+                  {op.tienda}
+                </p>
                 {op.url && (
                   <a
                     href={op.url}
+                    target="_blank"
+                    rel="noreferrer"
                     style={bodyFont}
                     className="text-xs tracking-[0.15em] text-[#1c2333] underline decoration-[#1c2333]/30 underline-offset-4 uppercase"
                   >
@@ -247,7 +248,7 @@ export function BodaClasica({
 
       {/* RSVP */}
       <section className="px-6 py-20 sm:py-28" style={{ backgroundColor: INK }}>
-        <p style={bodyFont} className="text-center text-xs tracking-[0.3em] text-[#f5efe4]/60 uppercase">
+        <p style={bodyFont} className="text-center text-xs tracking-[0.3em] text-[#f5efe4]/70 uppercase">
           Confirma tu lugar
         </p>
         <h2 style={displayFont} className="mt-3 mb-12 text-center text-3xl text-[#f5efe4] sm:text-4xl">
@@ -258,10 +259,10 @@ export function BodaClasica({
 
       {/* CIERRE */}
       <footer className="px-6 py-12 text-center">
-        <p style={scriptFont} className="text-2xl text-[#1c2333]/70">
+        <p style={scriptFont} className="text-2xl text-[#1c2333]/85">
           {d.nombre_novia} &amp; {d.nombre_novio}
         </p>
-        <p style={bodyFont} className="mt-2 text-xs tracking-[0.2em] text-[#1c2333]/40 uppercase">
+        <p style={bodyFont} className="mt-2 text-xs tracking-[0.2em] text-[#1c2333]/55 uppercase">
           {formatLargo(d.fecha_evento)}
         </p>
       </footer>

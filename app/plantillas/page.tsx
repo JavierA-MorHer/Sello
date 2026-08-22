@@ -22,10 +22,18 @@ export default async function PlantillasPage() {
     .eq('active', true)
     .order('created_at', { ascending: true })
 
+  const metadataName =
+    typeof user.user_metadata?.full_name === 'string'
+      ? user.user_metadata.full_name
+      : typeof user.user_metadata?.name === 'string'
+        ? user.user_metadata.name
+        : null
+  const displayName = metadataName ?? user.email?.split('@')[0] ?? 'de nuevo'
+
   return (
     <main className="min-h-screen bg-paper px-4 py-16 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-6xl">
-        <p className="font-body text-sm text-ink/60">Sesión iniciada como {user.email ?? user.id}</p>
+        <p className="font-body text-sm text-ink/60">Hola, {displayName}.</p>
         <h1 className="mt-3 max-w-lg font-display text-3xl sm:text-4xl">
           Elige tu plantilla.
         </h1>

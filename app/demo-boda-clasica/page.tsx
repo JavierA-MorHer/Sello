@@ -13,10 +13,8 @@ const SAMPLE_DATA: WeddingData = {
   hora_ceremonia: '5:00 pm',
   ceremonia_lugar: 'Hacienda San Rafael',
   ceremonia_direccion: 'Carretera a Tequisquiapan km 4.5, Querétaro',
-  ceremonia_mapa_url: '#',
   recepcion_lugar: 'Jardín Los Encinos',
   recepcion_direccion: 'Misma hacienda, salón principal',
-  recepcion_mapa_url: '#',
   eventos: [
     { hora: '5:00 pm', titulo: 'Ceremonia religiosa', descripcion: 'Bajo el arco del jardín principal' },
     { hora: '6:30 pm', titulo: 'Coctel de bienvenida', descripcion: 'Bebidas y aperitivos en la terraza' },
@@ -24,7 +22,7 @@ const SAMPLE_DATA: WeddingData = {
     { hora: '10:00 pm', titulo: 'Baile', descripcion: '¡A celebrar hasta que el cuerpo aguante!' },
   ],
   opciones: [
-    { tienda: 'Liverpool', url: '#', numero_mesa: '123456' },
+    { tienda: 'Liverpool', url: '#' },
     { tienda: 'Amazon', url: '#' },
     { tienda: 'Sobre de regalo' },
   ],

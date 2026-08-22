@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import type { Field, FieldSchema } from '@/lib/templates/types'
 import { DynamicForm } from '@/components/forms/DynamicForm'
@@ -23,6 +24,10 @@ function formatFieldValue(field: Field, raw: unknown): string {
     if (items.length === 0) return 'Sin agregar'
     return `${items.length} ${field.itemLabel ? field.itemLabel.toLowerCase() + (items.length === 1 ? '' : 's') : 'elementos'}`
   }
+  if (field.type === 'gallery') {
+    const count = Array.isArray(raw) ? raw.length : 0
+    return count === 0 ? 'Sin fotos' : `${count} foto${count === 1 ? '' : 's'}`
+  }
   if (field.type === 'date') return formatDateEs(raw) || 'Sin llenar'
   if (raw === undefined || raw === null || raw === '') return 'Sin llenar'
   return String(raw)
@@ -36,41 +41,85 @@ function summarizeSchema(
     .map((section) => ({
       section: section.title,
       rows: section.fields
-        .filter((field): field is Exclude<Field, { type: 'group' }> => field.type !== 'group')
+        .filter(
+          (field): field is Exclude<Field, { type: 'group' | 'map' }> =>
+            field.type !== 'group' && field.type !== 'map'
+        )
         .map((field) => ({ k: field.label, v: formatFieldValue(field, values[field.key]) })),
     }))
     .filter((section) => section.rows.length > 0)
 }
 
-function SaveStatusLine({ status }: { status: SaveStatus }) {
+function SaveStatusLine({ status, errorMessage }: { status: SaveStatus; errorMessage: string | null }) {
   return (
     <p className="h-4 font-body text-[11px] text-ink/40">
       {status === 'saving' && 'Guardando…'}
       {status === 'saved' && 'Cambios guardados'}
-      {status === 'error' && <span className="text-error">No se pudo guardar — revisa tu conexión</span>}
+      {status === 'error' && (
+        <span className="text-error">{errorMessage ?? 'No se pudo guardar — revisa tu conexión'}</span>
+      )}
     </p>
+  )
+}
+
+function daysUntil(iso: unknown): number | null {
+  if (typeof iso !== 'string' || !iso) return null
+  const target = new Date(`${iso}T00:00:00`)
+  if (Number.isNaN(target.getTime())) return null
+  return Math.max(0, Math.ceil((target.getTime() - Date.now()) / 86_400_000))
+}
+
+function CountdownPreview({ fechaEvento }: { fechaEvento: unknown }) {
+  const days = daysUntil(fechaEvento)
+  return (
+    <div className="flex flex-col gap-1 rounded-sm bg-paper-2 p-4">
+      <span className="font-body text-[11px] font-semibold tracking-[0.1em] text-ink/50 uppercase">
+        Cuenta regresiva
+      </span>
+      <span className="font-display text-2xl">{days === null ? '—' : `${days} días`}</span>
+      <span className="font-body text-xs text-ink/60">Se actualiza sola en la invitación.</span>
+    </div>
   )
 }
 
 export function CrearEventoForm({
   eventId,
-  templateName,
+  templateId,
   priceRange,
   schema,
   defaultValues,
 }: {
   eventId: string
-  templateName: string
+  templateId: string
   priceRange: string
   schema: FieldSchema
   defaultValues: Record<string, unknown>
 }) {
-  const [started, setStarted] = useState(false)
-  const [stepIndex, setStepIndex] = useState(0)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialStep = Number.parseInt(searchParams.get('paso') ?? '', 10)
+  const [stepIndex, setStepIndex] = useState(
+    Number.isNaN(initialStep) ? 0 : Math.max(0, Math.min(initialStep, schema.sections.length))
+  )
   const [status, setStatus] = useState<SaveStatus>('idle')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const { register, control, watch, getValues } = useForm({ defaultValues })
+
+  async function openPreview() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    setStatus('saving')
+    try {
+      await autosaveDraft(eventId, getValues())
+      setStatus('saved')
+    } catch (err) {
+      setStatus('error')
+      setErrorMessage(err instanceof Error ? err.message : null)
+    } finally {
+      router.push(`/crear/${templateId}/preview?paso=${stepIndex}`)
+    }
+  }
 
   useEffect(() => {
     const subscription = watch((values) => {
@@ -80,8 +129,10 @@ export function CrearEventoForm({
         try {
           await autosaveDraft(eventId, values as Record<string, unknown>)
           setStatus('saved')
-        } catch {
+          setErrorMessage(null)
+        } catch (err) {
           setStatus('error')
+          setErrorMessage(err instanceof Error ? err.message : null)
         }
       }, AUTOSAVE_DEBOUNCE_MS)
     })
@@ -92,46 +143,14 @@ export function CrearEventoForm({
     }
   }, [watch, eventId])
 
-  if (!started) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-16 text-center sm:px-6 sm:py-24">
-        <div className="mx-auto flex max-w-md flex-col items-center">
-          <p className="font-body text-xs font-semibold tracking-[0.16em] text-ink/50 uppercase">
-            Vas a armar
-          </p>
-
-          <div className="mt-6 flex aspect-[5/7] w-56 flex-col items-center justify-center gap-3 rounded-sm border border-clay/40 bg-paper-2 px-6 text-center">
-            <span className="font-display text-xl leading-tight">{templateName}</span>
-            <div className="h-px w-6 bg-ink/20" />
-            <span className="font-body text-xs font-semibold tracking-[0.14em] text-ink/60 uppercase">
-              {priceRange}
-            </span>
-          </div>
-
-          <h1 className="mt-8 font-display text-3xl">{templateName}</h1>
-          <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-ink/60">
-            Llena tus datos con autosave — puedes cerrar el navegador y retomar
-            después. Verás una vista previa con marca de agua antes de pagar.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setStarted(true)}
-            className="mt-9 rounded-sm bg-ink px-8 py-4 font-body text-base font-semibold text-paper transition-colors hover:bg-clay"
-          >
-            Comenzar a llenar →
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   const totalSteps = schema.sections.length + 1
   const isReview = stepIndex === schema.sections.length
   const currentSection = isReview ? null : schema.sections[stepIndex]
 
   function goToStep(index: number) {
-    setStepIndex(Math.max(0, Math.min(index, schema.sections.length)))
+    const next = Math.max(0, Math.min(index, schema.sections.length))
+    setStepIndex(next)
+    router.replace(`/crear/${templateId}?paso=${next}`, { scroll: false })
   }
 
   return (
@@ -142,7 +161,7 @@ export function CrearEventoForm({
           <div className="flex items-center justify-between">
             <button
               type="button"
-              onClick={() => (stepIndex === 0 ? setStarted(false) : goToStep(stepIndex - 1))}
+              onClick={() => (stepIndex === 0 ? router.push('/plantillas') : goToStep(stepIndex - 1))}
               className="font-body text-sm font-semibold text-ink/70 transition-colors hover:text-ink"
             >
               ← Atrás
@@ -152,9 +171,8 @@ export function CrearEventoForm({
             </span>
             <button
               type="button"
-              disabled={isReview}
-              onClick={() => goToStep(schema.sections.length)}
-              className="rounded-sm border border-ink/15 px-3 py-2 font-body text-xs font-semibold text-ink transition-colors hover:border-clay hover:text-clay disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={openPreview}
+              className="rounded-sm border border-ink/15 px-3 py-2 font-body text-xs font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
             >
               Preview
             </button>
@@ -169,7 +187,7 @@ export function CrearEventoForm({
             ))}
           </div>
 
-          <SaveStatusLine status={status} />
+          <SaveStatusLine status={status} errorMessage={errorMessage} />
         </div>
       </div>
 
@@ -222,7 +240,15 @@ export function CrearEventoForm({
                   </p>
                 )}
               </div>
-              <DynamicForm fields={currentSection.fields} register={register} control={control} />
+              <DynamicForm
+                fields={currentSection.fields}
+                register={register}
+                control={control}
+                eventId={eventId}
+              />
+              {currentSection.fields.some((f) => f.key === 'fecha_evento') && (
+                <CountdownPreview fechaEvento={watch('fecha_evento')} />
+              )}
             </>
           )
         )}
@@ -243,7 +269,7 @@ export function CrearEventoForm({
             <>
               <button
                 type="button"
-                onClick={() => goToStep(schema.sections.length)}
+                onClick={openPreview}
                 className="flex-none rounded-sm border border-ink/20 px-4 py-3.5 font-body text-sm font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
               >
                 Ver
