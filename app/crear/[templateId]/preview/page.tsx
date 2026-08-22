@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { TEMPLATE_COMPONENTS } from '@/lib/templates/registry'
-import type { WeddingData } from '@/components/templates/wedding.types'
 import type { FieldSchema } from '@/lib/templates/types'
 import { PreviewWatermark } from '@/components/preview/PreviewWatermark'
 
@@ -54,7 +53,7 @@ export default async function PreviewPage({
     notFound()
   }
 
-  const { fotos, ...custom_data } = draft.custom_data as WeddingData & { fotos?: string[] }
+  const { fotos, ...custom_data } = draft.custom_data as Record<string, unknown> & { fotos?: string[] }
   const reviewStepIndex = (template.field_schema as FieldSchema).sections.length
 
   return (

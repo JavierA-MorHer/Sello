@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { TEMPLATE_COMPONENTS } from '@/lib/templates/registry'
-import type { WeddingData } from '@/components/templates/wedding.types'
 
 // Solo estos dos estados corresponden a un evento pagado/publicado. 'draft'
 // (no pagado), 'expired' y 'archived' nunca deben renderizarse aquí — esto
@@ -50,7 +49,7 @@ export default async function EventoPublicoPage({
     notFound()
   }
 
-  const { fotos, ...custom_data } = event.custom_data as WeddingData & { fotos?: string[] }
+  const { fotos, ...custom_data } = event.custom_data as Record<string, unknown> & { fotos?: string[] }
 
   return <TemplateComponent custom_data={custom_data} fotos={fotos} eventId={event.id} />
 }

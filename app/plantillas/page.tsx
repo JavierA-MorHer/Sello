@@ -4,7 +4,7 @@ import { getPriceRangeForCategory } from '@/lib/templates/pricing'
 import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { SignOutButton } from '@/components/auth/SignOutButton'
 
-const COMING_SOON = ['XV Años', 'Bautizo', 'Genérico']
+const COMING_SOON = ['Genérico']
 
 export default async function PlantillasPage() {
   const supabase = await createClient()
