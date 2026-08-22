@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/server'
 import { AppMenu } from '@/components/nav/AppMenu'
+import { CopyShareActions } from '@/components/shared/CopyShareActions'
+import { getEventTitle } from '@/lib/templates/summary'
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
 
@@ -34,6 +36,7 @@ export default async function CheckoutSuccessPage({
   // mostrar el link correcto — si por lo que sea el webhook aún no corre,
   // igual mostramos una confirmación honesta en vez de fallar.
   let slug: string | null = null
+  let eventName: string | undefined
   try {
     const stripe = getStripe()
     const session = await stripe.checkout.sessions.retrieve(sessionId)
@@ -42,12 +45,22 @@ export default async function CheckoutSuccessPage({
     if (eventId) {
       const { data: event } = await supabase
         .from('events')
-        .select('slug, owner_id')
+        .select('slug, owner_id, template_id, custom_data')
         .eq('id', eventId)
         .single()
 
       if (event && event.owner_id === user.id) {
         slug = event.slug
+
+        const { data: template } = await supabase
+          .from('templates')
+          .select('category')
+          .eq('id', event.template_id)
+          .single()
+
+        if (template) {
+          eventName = getEventTitle(template.category, (event.custom_data ?? {}) as Record<string, unknown>)
+        }
       }
     }
   } catch {
@@ -75,14 +88,17 @@ export default async function CheckoutSuccessPage({
       </div>
 
       {link && (
-        <a
-          href={link}
-          target="_blank"
-          rel="noreferrer"
-          className="font-display text-lg text-clay underline decoration-clay/40 underline-offset-4"
-        >
-          {link}
-        </a>
+        <>
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            className="font-display text-lg text-clay underline decoration-clay/40 underline-offset-4"
+          >
+            {link}
+          </a>
+          <CopyShareActions link={link} eventName={eventName} />
+        </>
       )}
 
       <Link
