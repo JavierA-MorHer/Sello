@@ -53,14 +53,25 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe   # probar webhook
 - [x] Formulario dinámico (wizard paso a paso) + autosave por usuario
 - [x] Preview conectado — usa el mismo componente de plantilla, con marca de agua
 - [x] Storage de fotos (bucket `event-photos` + políticas RLS)
-- [ ] Stripe Checkout + webhook de activación — dependencia instalada, cero integración
-- [x] Decisión de dominio: el link del invitado es `slug.sello.com` (subdominio) — `proxy.ts` ya detecta el subdominio y reescribe a `/evento/{slug}`
-- [ ] Página pública del invitado — falta crear `app/evento/[slug]/page.tsx` (la ruta a la que ya reescribe `proxy.ts`); hoy cualquier subdominio da 404
-- [ ] RLS pública para lectura de eventos por slug — hoy `events` solo permite `owner_id = auth.uid()`, así que un invitado sin sesión no puede leer el evento
-- [ ] RSVP real — `RsvpForm` es solo visual, no escribe a `guests`/`rsvp_responses`
-- [ ] Panel del cliente (`/mis-eventos`) — sigue siendo un stub
-- [ ] Panel de admin (`/admin`)
-- [ ] Cron de expiración (columnas `expires_at`/`expiry_notified_*` existen, nada las usa)
-- [ ] Emails con Resend — dependencia instalada, cero integración
+- [x] Stripe Checkout + webhook de activación (`app/api/webhooks/stripe`) — código completo, **solo faltan las API keys reales** en `.env.local` (ver `.env.example`)
+- [x] Decisión de dominio: el link del invitado es `slug.sello.com` (subdominio) — `proxy.ts` detecta el subdominio y reescribe a `/evento/{slug}`
+- [x] Página pública del invitado (`app/evento/[slug]/page.tsx`)
+- [x] RLS pública para lectura de eventos por slug (`supabase/rls-public-event-read.sql`)
+- [x] RSVP real — `RsvpForm` guarda en `guests`/`rsvp_responses` vía `lib/rsvp/actions.ts`
+- [x] Panel del cliente (`/mis-eventos`) — lista eventos reales del usuario
+- [x] Panel de admin (`/admin`) — métricas agregadas, gateado por `app_metadata.role`
+- [x] Avisos de vencimiento + paso a `expired` (`app/api/cron/expire-events`, `vercel.json`) — el borrado definitivo (punto 4 de `ARCHITECTURE.md` §7) se deja sin implementar a propósito, ver el comentario en ese archivo
+- [x] Emails con Resend (`lib/email/`) — confirmación de pago y avisos de vencimiento
+- [x] Plantillas de XV años, Bautizo y Baby Shower (`XvAnos.tsx`, `Bautizo.tsx`, `BabyShower.tsx`) — ya insertadas en Supabase
+- [ ] Plantilla "Genérico" — sigue como "próximamente" en el catálogo, no se construyó (no hay spec de qué campos debería tener; es la única que queda sin definir)
+
+## Pendientes que requieren acceso externo (no resolubles por Claude Code)
+
+- **Pegar las API keys reales de Stripe** (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) y de ser necesario `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — ver comentarios en `.env.example`.
+- **Correr `supabase/rls-public-event-read.sql`** en el SQL Editor de Supabase si no se ha corrido aún — crear políticas RLS requiere SQL directo, no se puede hacer vía la API REST con la service role key.
+- **Configurar el cron en Vercel**: agregar la env var `CRON_SECRET` (ya generada en `.env.local`) en el proyecto de Vercel — Vercel Cron la manda automáticamente como header `Authorization: Bearer`.
+- **DNS wildcard** `*.sello.com` → Vercel (`ARCHITECTURE.md` §4) — necesita acceso al registrador del dominio.
+- **Verificar dominio en Resend** para poder usar `hola@sello.com` como remitente en vez del `onboarding@resend.dev` de prueba.
+- **Google OAuth "profesional"** (nombre "Sello", logo, dominio verificado) — ver guía dada en conversación; es 100% configuración en Google Cloud Console + Supabase Dashboard.
 
 Actualiza esta lista conforme avances — ayuda a retomar contexto en sesiones futuras.

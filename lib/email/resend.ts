@@ -3,7 +3,9 @@ import { Resend } from 'resend'
 // "onboarding@resend.dev" funciona sin verificar dominio propio (útil para
 // probar ya mismo). En cuanto verifiques sello.com en Resend, cambia esto a
 // algo como "Sello <hola@sello.com>".
-const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? 'Sello <onboarding@resend.dev>'
+// `||` a propósito (no `??`): una env var vacía ("") sigue siendo string,
+// no undefined, así que `??` no aplicaría el fallback.
+const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS || 'Sello <onboarding@resend.dev>'
 
 let resendClient: Resend | null = null
 
