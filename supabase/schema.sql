@@ -72,6 +72,13 @@ create policy "admin reads all events"
 on events for select
 using (auth.jwt() -> 'app_metadata' ->> 'role' = 'admin');
 
+-- La página pública del invitado (slug.dominio) lee sin sesión — solo
+-- expone eventos ya pagados/publicados. 'draft' (no pagado), 'expired' y
+-- 'archived' quedan bloqueados a nivel de base de datos, no solo en la app.
+create policy "publico lee eventos publicados"
+on events for select
+using (status in ('active', 'expiring_soon'));
+
 -- El cliente solo ve invitados de sus propios eventos
 create policy "owner reads own guests"
 on guests for select

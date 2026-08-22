@@ -4,7 +4,7 @@ Este archivo le da contexto a Claude Code al trabajar en este repositorio. Coló
 
 ## Qué es este proyecto
 
-Plataforma self-service de invitaciones digitales (bodas, XV años, bautizos, eventos). El cliente elige una plantilla, llena un formulario con sus datos, ve un preview, paga una vez, y recibe un enlace único (`slug.tuapp.com`) para compartir con sus invitados, quienes confirman asistencia (RSVP).
+Plataforma self-service de invitaciones digitales (bodas, XV años, bautizos, eventos). El cliente elige una plantilla, llena un formulario con sus datos, ve un preview, paga una vez, y recibe un enlace único (`slug.sello.com`) para compartir con sus invitados, quienes confirman asistencia (RSVP).
 
 Documentación completa:
 - `docs/PRODUCT.md` — qué se construye y por qué (leer primero si hay dudas de producto)
@@ -47,14 +47,20 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe   # probar webhook
 
 ## Estado actual del proyecto
 
-- [x] Schema de Supabase creado
-- [x] Auth con magic link funcionando
-- [ ] Primera plantilla (boda) con su `field_schema` y componente
-- [x] Formulario dinámico + autosave
-- [ ] Preview conectado
-- [ ] Stripe Checkout + webhook de activación
-- [ ] Panel del cliente (`/mis-eventos`)
+- [x] Schema de Supabase creado (RLS activo en `events`/`guests`/`rsvp_responses`/`templates`)
+- [x] Auth con Google OAuth + magic link funcionando
+- [x] Primera plantilla (Boda Clásica) con su `field_schema` y componente (`BodaClasica.tsx`)
+- [x] Formulario dinámico (wizard paso a paso) + autosave por usuario
+- [x] Preview conectado — usa el mismo componente de plantilla, con marca de agua
+- [x] Storage de fotos (bucket `event-photos` + políticas RLS)
+- [ ] Stripe Checkout + webhook de activación — dependencia instalada, cero integración
+- [x] Decisión de dominio: el link del invitado es `slug.sello.com` (subdominio) — `proxy.ts` ya detecta el subdominio y reescribe a `/evento/{slug}`
+- [ ] Página pública del invitado — falta crear `app/evento/[slug]/page.tsx` (la ruta a la que ya reescribe `proxy.ts`); hoy cualquier subdominio da 404
+- [ ] RLS pública para lectura de eventos por slug — hoy `events` solo permite `owner_id = auth.uid()`, así que un invitado sin sesión no puede leer el evento
+- [ ] RSVP real — `RsvpForm` es solo visual, no escribe a `guests`/`rsvp_responses`
+- [ ] Panel del cliente (`/mis-eventos`) — sigue siendo un stub
 - [ ] Panel de admin (`/admin`)
-- [ ] Cron de expiración
+- [ ] Cron de expiración (columnas `expires_at`/`expiry_notified_*` existen, nada las usa)
+- [ ] Emails con Resend — dependencia instalada, cero integración
 
 Actualiza esta lista conforme avances — ayuda a retomar contexto en sesiones futuras.

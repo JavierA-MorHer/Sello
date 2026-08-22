@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import type { Field, FieldSchema } from '@/lib/templates/types'
 import { DynamicForm } from '@/components/forms/DynamicForm'
-import { autosaveDraft } from './actions'
+import { autosaveDraft, createCheckoutSession } from './actions'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -103,9 +103,17 @@ export function CrearEventoForm({
   )
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isPaying, startPayTransition] = useTransition()
+  const payError = searchParams.get('error') === 'pago'
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const { register, control, watch, getValues } = useForm({ defaultValues })
+
+  async function handlePay() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    await autosaveDraft(eventId, getValues()).catch(() => {})
+    startPayTransition(() => createCheckoutSession(eventId, stepIndex))
+  }
 
   async function openPreview() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -228,6 +236,12 @@ export function CrearEventoForm({
                 completes el pago único de {priceRange}.
               </span>
             </div>
+
+            {payError && (
+              <p className="font-body text-sm text-error">
+                No se pudo iniciar el pago. Intenta de nuevo en un momento.
+              </p>
+            )}
           </>
         ) : (
           currentSection && (
@@ -260,10 +274,11 @@ export function CrearEventoForm({
           {isReview ? (
             <button
               type="button"
-              disabled
-              className="w-full cursor-not-allowed rounded-sm border border-ink/15 bg-paper-2 py-4 text-center font-body text-sm font-semibold text-ink/40"
+              disabled={isPaying}
+              onClick={handlePay}
+              className="w-full rounded-sm bg-ink py-4 text-center font-body text-sm font-semibold text-paper transition-colors hover:bg-clay disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Pagar y publicar — próximamente
+              {isPaying ? 'Redirigiendo a pago…' : `Pagar y publicar — ${priceRange}`}
             </button>
           ) : (
             <>

@@ -288,7 +288,7 @@ export default async function LandingPage() {
       {/* FOOTER */}
       <footer className="border-t border-ink/6 px-4 py-10 sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 font-body text-xs text-ink/50 sm:flex-row">
-          <span className="font-display text-base text-ink/70">Sello</span>
+          <Image src="/brand/sello-una-tinta.png" alt="Sello" width={98} height={42} />
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <span>Instagram</span>
             <span>WhatsApp</span>

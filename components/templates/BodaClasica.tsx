@@ -1,6 +1,7 @@
 import { Italiana, Work_Sans, Beau_Rivage } from 'next/font/google'
 import { TemplatePhoto } from './TemplatePhoto'
 import { RsvpForm } from './RsvpForm'
+import { EventCountdown } from './EventCountdown'
 import type { WeddingData } from './wedding.types'
 import { buildMapsSearchUrl } from '@/lib/text/maps'
 
@@ -80,6 +81,8 @@ export function BodaClasica({
           </p>
         </div>
       </section>
+
+      <EventCountdown fechaEvento={d.fecha_evento} />
 
       {/* BIENVENIDA */}
       {d.frase_bienvenida && (

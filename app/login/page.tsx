@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -62,7 +63,14 @@ function LoginContent() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-paper px-4 py-16">
       <div className="w-full max-w-sm">
-        <p className="text-center font-display text-2xl">Sello</p>
+        <Image
+          src="/brand/sello-una-tinta.png"
+          alt="Sello"
+          width={140}
+          height={60}
+          priority
+          className="mx-auto"
+        />
 
         <div className="mt-8 rounded-sm border border-ink/8 bg-paper p-8 text-ink">
           <div className="flex flex-col gap-6">

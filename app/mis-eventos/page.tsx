@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { SignOutButton } from '@/components/auth/SignOutButton'
 
 export default async function MisEventosPage() {
   const supabase = await createClient()
@@ -11,7 +12,10 @@ export default async function MisEventosPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="text-2xl font-semibold">Mis eventos</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold">Mis eventos</h1>
+        <SignOutButton />
+      </div>
       <p className="mt-2 text-gray-600">Sesión iniciada como {user.email}.</p>
     </main>
   )

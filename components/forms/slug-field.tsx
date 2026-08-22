@@ -5,7 +5,7 @@ import { useController, useWatch, type Control } from 'react-hook-form'
 import type { SlugField as SlugFieldType } from '@/lib/templates/types'
 import { slugify } from '@/lib/text/slugify'
 
-const LINK_PREFIX = 'sello.mx/'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
 
 export function SlugField({
   field,
@@ -34,7 +34,6 @@ export function SlugField({
 
   return (
     <div className="flex items-center rounded-sm border border-ink/15 bg-paper-2 px-3.5">
-      <span className="font-body text-sm text-ink/45">{LINK_PREFIX}</span>
       <input
         value={controllerField.value ?? ''}
         onChange={(e) => {
@@ -42,6 +41,7 @@ export function SlugField({
         }}
         className="flex-1 border-0 bg-transparent py-3 font-body text-base text-ink outline-none"
       />
+      <span className="font-body text-sm text-ink/45">.{ROOT_DOMAIN}</span>
     </div>
   )
 }
