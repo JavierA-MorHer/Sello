@@ -57,8 +57,9 @@ export function AppMenu({
 }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [coords, setCoords] = useState({ top: 0, right: 0 })
+  const [coords, setCoords] = useState({ top: 0, left: 0 })
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const PANEL_WIDTH = 256
 
   const triggerColor = variant === 'dark' ? 'text-paper hover:bg-paper/10' : 'text-ink hover:bg-ink/5'
 
@@ -69,7 +70,10 @@ export function AppMenu({
   function toggle() {
     if (!open && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect()
-      setCoords({ top: rect.bottom + 8, right: window.innerWidth - rect.right })
+      // Ancla por la izquierda del botón (donde esté, ya sea a la izquierda o
+      // a la derecha del header) y luego recorta para no salirse del viewport.
+      const left = Math.min(rect.left, window.innerWidth - PANEL_WIDTH - 8)
+      setCoords({ top: rect.bottom + 8, left: Math.max(8, left) })
     }
     setOpen((v) => !v)
   }
@@ -93,8 +97,8 @@ export function AppMenu({
           <>
             <div className="fixed inset-0 z-40 bg-ink/30" onClick={close} />
             <div
-              style={{ top: coords.top, right: coords.right }}
-              className="fixed z-50 w-64 rounded-sm border border-ink/10 bg-paper p-2 shadow-xl"
+              style={{ top: coords.top, left: coords.left, width: PANEL_WIDTH }}
+              className="fixed z-50 rounded-sm border border-ink/10 bg-paper p-2 shadow-xl"
             >
               {displayName && (
                 <p className="px-3 pt-1.5 pb-2 font-body text-xs text-ink/50">Hola, {displayName}</p>
