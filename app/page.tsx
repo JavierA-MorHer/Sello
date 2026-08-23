@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getPriceRangeForCategory } from '@/lib/templates/pricing'
 import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { RotatingHero, type HeroSlide } from '@/components/marketing/RotatingHero'
+import { AppMenu } from '@/components/nav/AppMenu'
 
 const HERO_SLIDES: HeroSlide[] = [
   { src: '/hero/boda.jpg', alt: 'Novios el día de su boda — invitación digital de Sello' },
@@ -76,12 +77,25 @@ function PlusIcon({ className }: { className?: string }) {
 
 export default async function LandingPage() {
   const supabase = await createClient()
-  const { data: templates } = await supabase
-    .from('templates')
-    .select('id, name, category')
-    .eq('active', true)
-    .order('created_at', { ascending: true })
-    .limit(6)
+  const [{ data: templates }, { data: userData }] = await Promise.all([
+    supabase
+      .from('templates')
+      .select('id, name, category')
+      .eq('active', true)
+      .order('created_at', { ascending: true })
+      .limit(6),
+    supabase.auth.getUser(),
+  ])
+  const user = userData.user
+
+  const metadataName =
+    typeof user?.user_metadata?.full_name === 'string'
+      ? user.user_metadata.full_name
+      : typeof user?.user_metadata?.name === 'string'
+        ? user.user_metadata.name
+        : null
+  const displayName = metadataName ?? user?.email?.split('@')[0] ?? null
+  const isAdmin = user?.app_metadata?.role === 'admin'
 
   return (
     <div className="flex-1 bg-paper text-ink">
@@ -89,9 +103,13 @@ export default async function LandingPage() {
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-6">
           <Image src="/brand/sello-principal.png" alt="Sello" width={98} height={42} priority />
-          <Link href="/login" className="font-body text-sm font-medium text-paper/85 hover:text-paper">
-            Entrar
-          </Link>
+          {user ? (
+            <AppMenu displayName={displayName} isAdmin={isAdmin} variant="dark" />
+          ) : (
+            <Link href="/login" className="font-body text-sm font-medium text-paper/85 hover:text-paper">
+              Entrar
+            </Link>
+          )}
         </div>
       </header>
 
