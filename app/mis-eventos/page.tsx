@@ -63,7 +63,15 @@ export default async function MisEventosPage() {
             <p className="font-body text-sm text-ink/60">Hola, {displayName}.</p>
             <h1 className="mt-3 font-display text-3xl sm:text-4xl">Mis eventos</h1>
           </div>
-          <AppMenu displayName={displayName} isAdmin={isAdmin} />
+          <div className="flex flex-none items-center gap-2">
+            <Link
+              href="/plantillas"
+              className="rounded-sm bg-ink px-4 py-2 font-body text-xs font-semibold whitespace-nowrap text-paper transition-colors hover:bg-clay"
+            >
+              + Nueva invitación
+            </Link>
+            <AppMenu displayName={displayName} isAdmin={isAdmin} />
+          </div>
         </div>
 
         {events && events.length > 0 ? (
