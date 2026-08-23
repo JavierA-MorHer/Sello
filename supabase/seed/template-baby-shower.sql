@@ -7,19 +7,45 @@ values (
   {
     "sections": [
       {
-        "id": "mama",
-        "title": "La mamá",
+        "id": "tema",
+        "title": "Tema",
+        "description": "Cambia los colores de toda la invitación.",
+        "fields": [
+          {
+            "key": "tema",
+            "label": "Tema",
+            "type": "select",
+            "required": true,
+            "options": [
+              { "value": "neutro", "label": "Neutro" },
+              { "value": "nino", "label": "Niño" },
+              { "value": "nina", "label": "Niña" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "bebe",
+        "title": "El bebé",
         "description": "Así aparecerá en la portada y en el link que compartes.",
         "fields": [
-          { "key": "nombre_mama", "label": "Nombre de la mamá", "type": "text", "required": true },
-          { "key": "nombre_bebe", "label": "Nombre del bebé (si ya lo tienen)", "type": "text" },
-          { "key": "sexo_bebe", "label": "Niño, niña o sorpresa", "type": "text" },
+          { "key": "nombre_bebe", "label": "Nombre del bebé (o de la mamá si aún no lo tienen)", "type": "text", "required": true },
+          { "key": "tagline", "label": "Frase corta bajo el nombre", "type": "text", "placeholder": "Ya viene en camino y queremos celebrarlo contigo" },
           {
             "key": "slug",
             "label": "Link de tu invitación",
             "type": "slug",
-            "sourceFields": ["nombre_mama"]
+            "sourceFields": ["nombre_bebe"]
           }
+        ]
+      },
+      {
+        "id": "papas",
+        "title": "Los papás",
+        "description": "Quién organiza el festejo.",
+        "fields": [
+          { "key": "padres", "label": "Nombres de los papás", "type": "text", "required": true, "placeholder": "Regina y Mateo" },
+          { "key": "dedicatoria", "label": "Dedicatoria", "type": "textarea", "maxLength": 240 }
         ]
       },
       {
@@ -27,15 +53,15 @@ values (
         "title": "Fecha",
         "description": "Se usa para la cuenta regresiva del evento.",
         "fields": [
-          { "key": "fecha_evento", "label": "Fecha del evento", "type": "date", "required": true }
+          { "key": "fecha_evento", "label": "Fecha del evento", "type": "date", "required": true },
+          { "key": "hora_evento", "label": "Hora", "type": "time", "required": true }
         ]
       },
       {
         "id": "lugar",
         "title": "Lugar",
-        "description": "Dónde y a qué hora es el festejo.",
+        "description": "Dónde es el festejo.",
         "fields": [
-          { "key": "hora_evento", "label": "Hora", "type": "time" },
           { "key": "lugar_nombre", "label": "Nombre del lugar", "type": "text", "required": true },
           { "key": "lugar_direccion", "label": "Dirección", "type": "text", "required": true },
           {
@@ -47,12 +73,12 @@ values (
         ]
       },
       {
-        "id": "itinerario",
-        "title": "Programa",
-        "description": "Opcional — juegos, pastel, apertura de regalos...",
+        "id": "plan",
+        "title": "El plan del día",
+        "description": "Opcional — llegada, comida, juegos, apertura de regalos...",
         "fields": [
           {
-            "key": "eventos",
+            "key": "plan",
             "label": "Momentos del día",
             "type": "repeater",
             "itemLabel": "Momento",
@@ -61,18 +87,28 @@ values (
             "max": 8,
             "fields": [
               { "key": "hora", "label": "Hora", "type": "time", "required": true },
-              { "key": "titulo", "label": "Título", "type": "text", "required": true },
-              { "key": "descripcion", "label": "Descripción", "type": "textarea" }
+              { "key": "titulo", "label": "Qué pasa", "type": "text", "required": true }
             ]
           }
         ]
       },
       {
-        "id": "fotos",
-        "title": "Fotos",
-        "description": "Sube hasta 12 fotos. La primera será la portada.",
+        "id": "juegos",
+        "title": "Juguemos",
+        "description": "Opcional — juegos o dinámicas para tus invitados.",
         "fields": [
-          { "key": "fotos", "label": "Fotos", "type": "gallery", "min": 0, "max": 12 }
+          {
+            "key": "juegos",
+            "label": "Juegos",
+            "type": "repeater",
+            "itemLabel": "Juego",
+            "min": 0,
+            "max": 6,
+            "fields": [
+              { "key": "titulo", "label": "Nombre del juego", "type": "text", "required": true },
+              { "key": "descripcion", "label": "En qué consiste", "type": "textarea" }
+            ]
+          }
         ]
       },
       {
@@ -81,17 +117,19 @@ values (
         "description": "Dónde están registrados para regalos del bebé.",
         "fields": [
           {
-            "key": "opciones",
+            "key": "tiendas",
             "label": "Opciones de regalo",
             "type": "repeater",
             "itemLabel": "Opción",
             "min": 0,
             "max": 6,
             "fields": [
-              { "key": "tienda", "label": "Tienda", "type": "text", "required": true },
+              { "key": "nombre", "label": "Tienda", "type": "text", "required": true },
+              { "key": "detalle", "label": "Detalle", "type": "text", "placeholder": "Lista de bebé · Emiliano" },
               { "key": "url", "label": "Link", "type": "url" }
             ]
-          }
+          },
+          { "key": "talla_sugerida", "label": "Talla sugerida de ropa", "type": "text", "placeholder": "3 a 6 meses" }
         ]
       },
       {
@@ -99,16 +137,7 @@ values (
         "title": "Confirmación de asistencia",
         "description": "Así confirmarán tus invitados que van a asistir.",
         "fields": [
-          { "key": "fecha_limite_rsvp", "label": "Fecha límite para confirmar", "type": "date" },
-          { "key": "mensaje_rsvp", "label": "Mensaje para invitados", "type": "textarea" }
-        ]
-      },
-      {
-        "id": "dedicatoria",
-        "title": "Dedicatoria",
-        "description": "Un mensaje corto para tus invitados, justo después de la portada.",
-        "fields": [
-          { "key": "frase_bienvenida", "label": "Tu dedicatoria", "type": "textarea", "maxLength": 240 }
+          { "key": "fecha_limite_rsvp", "label": "Fecha límite para confirmar", "type": "date" }
         ]
       }
     ]

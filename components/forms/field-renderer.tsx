@@ -46,6 +46,7 @@ export function FieldRenderer({
           </span>
           <input
             type={field.type === 'url' ? 'url' : 'text'}
+            placeholder={field.placeholder}
             {...register(name, { required: field.required })}
             className={inputClass}
           />
@@ -82,6 +83,30 @@ export function FieldRenderer({
             {...register(name, { required: field.required })}
             className={`${inputClass} sm:max-w-[16rem]`}
           />
+        </label>
+      )
+
+    case 'select':
+      return (
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>
+            {labelText}
+            {field.required && <span className="text-clay"> *</span>}
+          </span>
+          <select
+            {...register(name, { required: field.required })}
+            defaultValue=""
+            className={`${inputClass} sm:max-w-[16rem]`}
+          >
+            <option value="" disabled>
+              Elige una opción
+            </option>
+            {field.options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </label>
       )
 

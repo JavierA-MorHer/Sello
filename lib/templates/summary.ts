@@ -19,7 +19,7 @@ export function getEventTitle(category: string, customData: Record<string, unkno
     case 'bautizo':
       return str('nombre_bebe') ?? 'Bautizo'
     case 'baby_shower':
-      return str('nombre_mama') ?? 'Baby shower'
+      return str('nombre_bebe') ?? 'Baby shower'
     default:
       return 'Evento'
   }

@@ -32,6 +32,7 @@ function formatFieldValue(field: Field, raw: unknown): string {
   }
   if (field.type === 'date') return formatDateEs(raw) || 'Sin llenar'
   if (raw === undefined || raw === null || raw === '') return 'Sin llenar'
+  if (field.type === 'select') return field.options.find((opt) => opt.value === raw)?.label ?? String(raw)
   return String(raw)
 }
 
