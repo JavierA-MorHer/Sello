@@ -16,6 +16,7 @@ export function RsvpForm({
   const [name, setName] = useState('')
   const [attending, setAttending] = useState<'si' | 'no' | null>(null)
   const [plusOnes, setPlusOnes] = useState(0)
+  const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -42,7 +43,7 @@ export function RsvpForm({
     setError(null)
     startTransition(async () => {
       try {
-        await submitRsvp(eventId, { name, attending: attending === 'si', plusOnes })
+        await submitRsvp(eventId, { name, attending: attending === 'si', plusOnes, message })
         setSent(true)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'No se pudo guardar tu confirmación.')
@@ -120,6 +121,18 @@ export function RsvpForm({
           />
         </label>
       )}
+
+      <label className="flex flex-col gap-1.5">
+        <span className="font-[family-name:var(--font-tpl-body)] text-xs font-medium tracking-[0.1em] text-[#f5efe4]/70 uppercase">
+          Mensaje (opcional)
+        </span>
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          rows={2}
+          className="resize-none border-0 border-b border-[#f5efe4]/30 bg-transparent px-0.5 py-2 font-[family-name:var(--font-tpl-body)] text-base text-[#f5efe4] outline-none placeholder:text-[#f5efe4]/30 focus:border-[#f5efe4]"
+        />
+      </label>
 
       {!eventId && (
         <p className="text-center font-[family-name:var(--font-tpl-body)] text-xs text-[#f5efe4]/50">

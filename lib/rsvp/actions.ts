@@ -12,7 +12,7 @@ const PUBLISHED_STATUSES = ['active', 'expiring_soon']
  */
 export async function submitRsvp(
   eventId: string,
-  data: { name: string; attending: boolean; plusOnes: number }
+  data: { name: string; attending: boolean; plusOnes: number; message?: string }
 ) {
   const name = data.name.trim()
   if (!name) {
@@ -39,9 +39,11 @@ export async function submitRsvp(
     throw new Error('No se pudo guardar tu confirmación. Intenta de nuevo.')
   }
 
+  const message = data.message?.trim() || null
+
   const { error: rsvpError } = await supabase
     .from('rsvp_responses')
-    .insert({ guest_id: guest.id, attending: data.attending, plus_ones: plusOnes })
+    .insert({ guest_id: guest.id, attending: data.attending, plus_ones: plusOnes, message })
 
   if (rsvpError) {
     throw new Error('No se pudo guardar tu confirmación. Intenta de nuevo.')

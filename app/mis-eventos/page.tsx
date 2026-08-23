@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AppMenu } from '@/components/nav/AppMenu'
 import { getEventTitle } from '@/lib/templates/summary'
+import { DeleteDraftButton } from './delete-draft-button'
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
 const PUBLISHED_STATUSES = ['active', 'expiring_soon']
@@ -124,12 +125,15 @@ export default async function MisEventosPage() {
                       </Link>
                     )}
                     {event.status === 'draft' && (
-                      <Link
-                        href={`/crear/${event.template_id}`}
-                        className="inline-block rounded-sm border border-ink/20 px-4 py-2 font-body text-xs font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
-                      >
-                        Continuar armando
-                      </Link>
+                      <>
+                        <Link
+                          href={`/crear/${event.template_id}`}
+                          className="inline-block rounded-sm border border-ink/20 px-4 py-2 font-body text-xs font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
+                        >
+                          Continuar armando
+                        </Link>
+                        <DeleteDraftButton eventId={event.id} eventName={title} />
+                      </>
                     )}
                     {(event.status === 'expired' || event.status === 'archived') && (
                       <span className="font-body text-xs text-ink/40">Ya no está disponible</span>
