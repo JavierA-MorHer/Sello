@@ -31,7 +31,7 @@ function formatFieldValue(field: Field, raw: unknown): string {
     return count === 0 ? 'Sin fotos' : `${count} foto${count === 1 ? '' : 's'}`
   }
   if (field.type === 'date') return formatDateEs(raw) || 'Sin llenar'
-  if (raw === undefined || raw === null || raw === '') return 'Sin llenar'
+  if (raw === undefined || raw === null || raw === '' || (typeof raw === 'number' && Number.isNaN(raw))) return 'Sin llenar'
   if (field.type === 'select') return field.options.find((opt) => opt.value === raw)?.label ?? String(raw)
   return String(raw)
 }
@@ -71,6 +71,7 @@ function isFieldEmpty(field: Field, raw: unknown): boolean {
     return items.length === 0
   }
   if (field.type === 'gallery') return !Array.isArray(raw) || raw.length === 0
+  if (field.type === 'number') return typeof raw !== 'number' || Number.isNaN(raw)
   return raw === undefined || raw === null || raw === ''
 }
 

@@ -86,6 +86,23 @@ export function FieldRenderer({
         </label>
       )
 
+    case 'number':
+      return (
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>
+            {labelText}
+            {field.required && <span className="text-clay"> *</span>}
+          </span>
+          <input
+            type="number"
+            min={field.min}
+            max={field.max}
+            {...register(name, { required: field.required, valueAsNumber: true })}
+            className={`${inputClass} sm:max-w-[10rem]`}
+          />
+        </label>
+      )
+
     case 'select':
       return (
         <label className="flex flex-col gap-1.5">

@@ -1,31 +1,33 @@
-export interface XvAnosEvento {
+export type XvAnosTema = 'noche' | 'esmeralda' | 'vino'
+
+export interface XvAnosProgramaItem {
   hora: string
   titulo: string
-  descripcion?: string
 }
 
-export interface XvAnosPadrino {
+export interface XvAnosTienda {
   nombre: string
-  rol?: string
-}
-
-export interface XvAnosRegalo {
-  tienda: string
   url?: string
 }
 
 export interface XvAnosData {
+  tema?: XvAnosTema
   nombre_festejada: string
-  frase_bienvenida?: string
   fecha_evento: string
-  hora_misa?: string
-  iglesia_lugar: string
+  padres: string
+  padrinos?: string
+  dedicatoria?: string
+  iglesia_nombre: string
   iglesia_direccion: string
-  recepcion_lugar: string
+  iglesia_hora?: string
+  recepcion_nombre: string
   recepcion_direccion: string
-  eventos?: XvAnosEvento[]
-  padrinos?: XvAnosPadrino[]
-  opciones?: XvAnosRegalo[]
+  recepcion_hora?: string
+  programa?: XvAnosProgramaItem[]
+  vestimenta?: string
+  vestimenta_nota?: string
+  tiendas?: XvAnosTienda[]
+  /** Cuántos lugares trae cada invitación (1-20). Se aplica igual a todos los invitados: aún no hay pases individuales por invitado. */
+  pases_por_invitacion?: number
   fecha_limite_rsvp?: string
-  mensaje_rsvp?: string
 }

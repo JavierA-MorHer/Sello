@@ -1,36 +1,86 @@
-import { Cormorant_Garamond, Nunito_Sans } from 'next/font/google'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Bodoni_Moda, Jost } from 'next/font/google'
+import type { XvAnosData, XvAnosTema } from './xvanos.types'
+import { XvAnosRsvp } from './XvAnosRsvp'
 import { TemplatePhoto } from './TemplatePhoto'
-import { RsvpForm } from './RsvpForm'
-import { EventCountdown } from './EventCountdown'
-import type { XvAnosData } from './xvanos.types'
 import { buildMapsSearchUrl } from '@/lib/text/maps'
 
-const display = Cormorant_Garamond({
-  weight: ['500', '600'],
-  subsets: ['latin'],
-  variable: '--font-tpl-display',
-})
-const body = Nunito_Sans({ subsets: ['latin'], variable: '--font-tpl-body' })
+const display = Bodoni_Moda({ weight: ['400', '500'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-tpl-display' })
+const body = Jost({ weight: ['300', '400', '500'], subsets: ['latin'], variable: '--font-tpl-body' })
 
-const IVORY = '#fbf1ec'
-const INK = '#2c2130'
+const IVORY = '#f7f1e8'
+const LABEL_GRAY = '#9a90a0'
+const BORDER = 'rgba(201,162,94,.22)'
 
-function formatLargo(iso?: string) {
+const TEMAS: Record<XvAnosTema, { dark: string; gold: string }> = {
+  noche: { dark: '#17121a', gold: '#c9a25e' },
+  esmeralda: { dark: '#0f1a17', gold: '#c9a25e' },
+  vino: { dark: '#1c1013', gold: '#d8a9a0' },
+}
+
+const displayFont = { fontFamily: 'var(--font-tpl-display)' }
+const bodyFont = { fontFamily: 'var(--font-tpl-body)' }
+
+function formatLarga(iso?: string) {
   if (!iso) return ''
   const date = new Date(`${iso}T00:00:00`)
   if (Number.isNaN(date.getTime())) return iso
   return new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
 }
 
-function formatCorto(iso?: string) {
+function formatCorta(iso?: string) {
   if (!iso) return ''
   const date = new Date(`${iso}T00:00:00`)
   if (Number.isNaN(date.getTime())) return iso
   return new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'long' }).format(date)
 }
 
-const displayFont = { fontFamily: 'var(--font-tpl-display)' }
-const bodyFont = { fontFamily: 'var(--font-tpl-body)' }
+function useCountdown(fechaEvento?: string, horaEvento?: string) {
+  const [parts, setParts] = useState<{ dias: number; horas: number; min: number; seg: number } | null>(null)
+
+  useEffect(() => {
+    if (!fechaEvento) return
+    const target = new Date(`${fechaEvento}T${horaEvento || '00:00'}`)
+    if (Number.isNaN(target.getTime())) return
+
+    function tick() {
+      const diff = target.getTime() - Date.now()
+      if (diff <= 0) {
+        setParts({ dias: 0, horas: 0, min: 0, seg: 0 })
+        return
+      }
+      const dias = Math.floor(diff / 86_400_000)
+      const horas = Math.floor((diff % 86_400_000) / 3_600_000)
+      const min = Math.floor((diff % 3_600_000) / 60_000)
+      const seg = Math.floor((diff % 60_000) / 1000)
+      setParts({ dias, horas, min, seg })
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [fechaEvento, horaEvento])
+
+  return parts
+}
+
+function Eyebrow({ children, tracking = '.32em', color }: { children: React.ReactNode; tracking?: string; color: string }) {
+  return (
+    <span
+      style={{
+        ...bodyFont,
+        fontSize: 10,
+        letterSpacing: tracking,
+        paddingLeft: tracking,
+        textTransform: 'uppercase',
+        color,
+      }}
+    >
+      {children}
+    </span>
+  )
+}
 
 export function XvAnos({
   custom_data,
@@ -42,133 +92,135 @@ export function XvAnos({
   eventId?: string | null
 }) {
   const d = custom_data
-  const portada = fotos[0] ?? '/demo/boda-placeholder.jpg'
+  const tema = TEMAS[d.tema ?? 'noche']
+  const countdown = useCountdown(d.fecha_evento, undefined)
+  const pases = d.pases_por_invitacion && d.pases_por_invitacion > 0 ? d.pases_por_invitacion : 4
+  const retrato = fotos[0]
   const galeria = fotos.slice(1)
-  const iglesiaMapaUrl = buildMapsSearchUrl(d.iglesia_lugar, d.iglesia_direccion)
-  const recepcionMapaUrl = buildMapsSearchUrl(d.recepcion_lugar, d.recepcion_direccion)
+  const iglesiaMapaUrl = buildMapsSearchUrl(d.iglesia_nombre, d.iglesia_direccion)
+  const recepcionMapaUrl = buildMapsSearchUrl(d.recepcion_nombre, d.recepcion_direccion)
 
   return (
-    <div
-      className={`${display.variable} ${body.variable}`}
-      style={{ backgroundColor: IVORY, color: INK }}
-    >
-      {/* HERO */}
-      <section className="relative flex min-h-screen items-end justify-center overflow-hidden">
-        <TemplatePhoto src={portada} alt="" priority sizes="100vw" className="absolute inset-0" />
-        <div
-          className="absolute inset-0"
-          style={{ background: `linear-gradient(to top, ${INK} 0%, rgba(44,33,48,0.4) 45%, rgba(44,33,48,0.05) 75%)` }}
+    <div className={`${display.variable} ${body.variable}`} style={{ ...bodyFont, fontWeight: 300, background: tema.dark, color: IVORY }}>
+      <style>{`
+        @keyframes xv-in { 0% { opacity: 0; transform: translateY(16px); } 100% { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) {
+          [data-xv-anim] { animation: none !important; opacity: 1 !important; transform: none !important; }
+        }
+      `}</style>
+
+      {/* PORTADA */}
+      <section style={{ position: 'relative', padding: '64px 30px 58px', textAlign: 'center', overflow: 'hidden', animation: 'xv-in 1s ease-out both' }} data-xv-anim>
+        <span
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 1,
+            height: 44,
+            background: `linear-gradient(${tema.gold}, transparent)`,
+          }}
         />
-        <div className="relative z-10 flex flex-col items-center gap-4 px-6 pb-16 text-center sm:pb-24">
-          <p style={bodyFont} className="text-xs font-semibold tracking-[0.35em] text-[#fbf1ec]/85 uppercase">
-            Mis XV años
-          </p>
-          <h1 style={displayFont} className="text-6xl leading-none text-[#fbf1ec] sm:text-8xl">
-            {d.nombre_festejada}
-          </h1>
-          <p style={bodyFont} className="text-sm font-semibold tracking-[0.25em] text-[#fbf1ec]/85 uppercase">
-            {formatLargo(d.fecha_evento)}
-          </p>
+        <span
+          style={{
+            position: 'absolute',
+            top: 106,
+            left: 0,
+            right: 0,
+            height: 1,
+            background: 'linear-gradient(90deg, transparent, rgba(201,162,94,.35), transparent)',
+          }}
+        />
+
+        <Eyebrow tracking=".42em" color={tema.gold}>
+          Mis quince años
+        </Eyebrow>
+        <div style={{ margin: '26px 0 22px' }}>
+          <span style={{ ...displayFont, fontSize: 118, lineHeight: 0.86, letterSpacing: '-.04em', color: tema.gold }}>XV</span>
+        </div>
+        <p style={{ ...displayFont, fontStyle: 'italic', fontSize: 19, letterSpacing: '.05em', color: 'rgba(247,241,232,.6)', marginTop: 6 }}>
+          {formatLarga(d.fecha_evento)}
+        </p>
+        <span style={{ display: 'block', width: 44, height: 1, background: 'rgba(201,162,94,.5)', margin: '22px auto' }} />
+        <h1 style={{ ...displayFont, fontSize: 42, lineHeight: '47px', letterSpacing: '-.01em', textWrap: 'balance', margin: 0 }}>
+          {d.nombre_festejada}
+        </h1>
+      </section>
+
+      {/* RETRATO */}
+      <div style={{ height: 300, overflow: 'hidden', borderTop: '1px solid rgba(201,162,94,.18)', borderBottom: '1px solid rgba(201,162,94,.18)', position: 'relative' }}>
+        {retrato ? (
+          <TemplatePhoto src={retrato} alt="" sizes="430px" className="absolute inset-0" />
+        ) : (
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'repeating-linear-gradient(135deg, #1c1620 0 10px, #221a26 10px 20px)',
+            }}
+          >
+            <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.24em', color: LABEL_GRAY }}>RETRATO DE LA QUINCEAÑERA</span>
+          </div>
+        )}
+      </div>
+
+      {/* PRESENTACION */}
+      <section style={{ padding: '52px 30px', textAlign: 'center' }}>
+        <Eyebrow color={tema.gold}>Con la bendición de</Eyebrow>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 22 }}>
+          <div>
+            <div style={{ ...bodyFont, fontSize: 11, letterSpacing: '.24em', textTransform: 'uppercase', color: LABEL_GRAY, marginBottom: 7 }}>
+              Mis padres
+            </div>
+            <div style={{ ...displayFont, fontSize: 19, lineHeight: '27px', color: IVORY }}>{d.padres}</div>
+          </div>
+          {d.padrinos && (
+            <div>
+              <div style={{ ...bodyFont, fontSize: 11, letterSpacing: '.24em', textTransform: 'uppercase', color: LABEL_GRAY, marginBottom: 7 }}>
+                Mis padrinos
+              </div>
+              <div style={{ ...displayFont, fontSize: 19, lineHeight: '27px', color: IVORY }}>{d.padrinos}</div>
+            </div>
+          )}
         </div>
       </section>
 
-      <EventCountdown fechaEvento={d.fecha_evento} />
-
-      {/* BIENVENIDA */}
-      {d.frase_bienvenida && (
-        <section className="px-6 py-20 sm:py-28">
-          <p style={displayFont} className="mx-auto max-w-lg text-center text-2xl leading-relaxed sm:text-3xl">
-            {d.frase_bienvenida}
-          </p>
+      {/* DEDICATORIA */}
+      {d.dedicatoria && (
+        <section style={{ padding: '0 30px 52px' }}>
+          <div style={{ borderTop: '1px solid rgba(201,162,94,.18)', borderBottom: '1px solid rgba(201,162,94,.18)', padding: '38px 20px', textAlign: 'center' }}>
+            <p style={{ ...displayFont, fontStyle: 'italic', fontSize: 21, lineHeight: '33px', color: 'rgba(247,241,232,.88)', textWrap: 'pretty', margin: 0 }}>
+              {d.dedicatoria}
+            </p>
+          </div>
         </section>
       )}
 
-      {/* DETALLES */}
-      <section className="border-t border-[#2c2130]/10 px-6 py-20 sm:py-28">
-        <p style={bodyFont} className="text-center text-xs font-semibold tracking-[0.3em] text-[#2c2130]/60 uppercase">
-          Los detalles
-        </p>
-        <h2 style={displayFont} className="mt-3 text-center text-3xl sm:text-4xl">
-          Dónde y cuándo
-        </h2>
-
-        <div className="mx-auto mt-14 grid max-w-3xl gap-10 sm:grid-cols-2">
-          <div className="text-center">
-            <p style={bodyFont} className="text-xs font-semibold tracking-[0.2em] text-[#2c2130]/60 uppercase">
-              Misa{d.hora_misa ? ` · ${d.hora_misa}` : ''}
-            </p>
-            <p style={displayFont} className="mt-3 text-2xl">
-              {d.iglesia_lugar}
-            </p>
-            <p style={bodyFont} className="mt-2 text-sm text-[#2c2130]/85">
-              {d.iglesia_direccion}
-            </p>
-            {iglesiaMapaUrl && (
-              <a
-                href={iglesiaMapaUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={bodyFont}
-                className="mt-3 inline-block text-xs font-semibold tracking-[0.15em] text-[#2c2130] underline decoration-[#2c2130]/30 underline-offset-4 uppercase"
+      {/* CUENTA REGRESIVA */}
+      {countdown && (
+        <section style={{ padding: '0 30px 52px', textAlign: 'center' }}>
+          <Eyebrow color={tema.gold}>Faltan</Eyebrow>
+          <div style={{ display: 'flex', marginTop: 18 }}>
+            {[
+              { n: countdown.dias, l: 'Días' },
+              { n: String(countdown.horas).padStart(2, '0'), l: 'Hrs' },
+              { n: String(countdown.min).padStart(2, '0'), l: 'Min' },
+              { n: String(countdown.seg).padStart(2, '0'), l: 'Seg' },
+            ].map((c, i) => (
+              <div
+                key={c.l}
+                style={{
+                  flex: 1,
+                  padding: '0 4px',
+                  borderRight: i === 3 ? '1px solid transparent' : '1px solid rgba(201,162,94,.18)',
+                }}
               >
-                Ver mapa
-              </a>
-            )}
-          </div>
-
-          <div className="text-center">
-            <p style={bodyFont} className="text-xs font-semibold tracking-[0.2em] text-[#2c2130]/60 uppercase">
-              Recepción
-            </p>
-            <p style={displayFont} className="mt-3 text-2xl">
-              {d.recepcion_lugar}
-            </p>
-            <p style={bodyFont} className="mt-2 text-sm text-[#2c2130]/85">
-              {d.recepcion_direccion}
-            </p>
-            {recepcionMapaUrl && (
-              <a
-                href={recepcionMapaUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={bodyFont}
-                className="mt-3 inline-block text-xs font-semibold tracking-[0.15em] text-[#2c2130] underline decoration-[#2c2130]/30 underline-offset-4 uppercase"
-              >
-                Ver mapa
-              </a>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ITINERARIO */}
-      {d.eventos && d.eventos.length > 0 && (
-        <section className="border-t border-[#2c2130]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs font-semibold tracking-[0.3em] text-[#2c2130]/60 uppercase">
-            El programa
-          </p>
-          <h2 style={displayFont} className="mt-3 text-center text-3xl sm:text-4xl">
-            Itinerario
-          </h2>
-
-          <div className="mx-auto mt-14 flex max-w-md flex-col gap-6">
-            {d.eventos.map((evento, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <span
-                  style={bodyFont}
-                  className="mt-0.5 flex-none rounded-full border border-[#2c2130]/20 px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-[#2c2130]/75"
-                >
-                  {evento.hora}
-                </span>
-                <div className="flex flex-col gap-0.5 pt-1">
-                  <p style={displayFont} className="text-xl leading-snug">
-                    {evento.titulo}
-                  </p>
-                  {evento.descripcion && (
-                    <p style={bodyFont} className="text-sm text-[#2c2130]/85">
-                      {evento.descripcion}
-                    </p>
-                  )}
+                <div style={{ ...displayFont, fontSize: 36, lineHeight: 1, color: tema.gold }}>{c.n}</div>
+                <div style={{ ...bodyFont, fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase', color: LABEL_GRAY, marginTop: 8 }}>
+                  {c.l}
                 </div>
               </div>
             ))}
@@ -176,113 +228,187 @@ export function XvAnos({
         </section>
       )}
 
-      {/* PADRINOS */}
-      {d.padrinos && d.padrinos.length > 0 && (
-        <section className="border-t border-[#2c2130]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs font-semibold tracking-[0.3em] text-[#2c2130]/60 uppercase">
-            Con cariño
-          </p>
-          <h2 style={displayFont} className="mt-3 mb-14 text-center text-3xl sm:text-4xl">
-            Padrinos
-          </h2>
+      {/* SEDES */}
+      <section style={{ padding: '0 30px 52px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ border: `1px solid ${BORDER}`, padding: '28px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.26em', textTransform: 'uppercase', color: tema.gold }}>Misa de acción de gracias</span>
+          <span style={{ ...displayFont, fontSize: 24, lineHeight: '31px', marginTop: 2 }}>{d.iglesia_nombre}</span>
+          <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '20px', color: 'rgba(247,241,232,.6)' }}>{d.iglesia_direccion}</span>
+          {d.iglesia_hora && (
+            <span style={{ ...displayFont, fontStyle: 'italic', fontSize: 17, color: tema.gold, marginTop: 4 }}>{d.iglesia_hora}</span>
+          )}
+          {iglesiaMapaUrl && (
+            <a
+              href={iglesiaMapaUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...bodyFont,
+                alignSelf: 'center',
+                marginTop: 12,
+                fontSize: 10,
+                letterSpacing: '.18em',
+                textTransform: 'uppercase',
+                color: tema.gold,
+                borderBottom: '1px solid rgba(201,162,94,.6)',
+                paddingBottom: 4,
+                textDecoration: 'none',
+              }}
+            >
+              Ver mapa
+            </a>
+          )}
+        </div>
+        <div style={{ border: `1px solid ${BORDER}`, padding: '28px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.26em', textTransform: 'uppercase', color: tema.gold }}>Recepción</span>
+          <span style={{ ...displayFont, fontSize: 24, lineHeight: '31px', marginTop: 2 }}>{d.recepcion_nombre}</span>
+          <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '20px', color: 'rgba(247,241,232,.6)' }}>{d.recepcion_direccion}</span>
+          {d.recepcion_hora && (
+            <span style={{ ...displayFont, fontStyle: 'italic', fontSize: 17, color: tema.gold, marginTop: 4 }}>{d.recepcion_hora}</span>
+          )}
+          {recepcionMapaUrl && (
+            <a
+              href={recepcionMapaUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...bodyFont,
+                alignSelf: 'center',
+                marginTop: 12,
+                fontSize: 10,
+                letterSpacing: '.18em',
+                textTransform: 'uppercase',
+                color: tema.gold,
+                borderBottom: '1px solid rgba(201,162,94,.6)',
+                paddingBottom: 4,
+                textDecoration: 'none',
+              }}
+            >
+              Ver mapa
+            </a>
+          )}
+        </div>
+      </section>
 
-          <div className="mx-auto grid max-w-2xl grid-cols-2 gap-x-6 gap-y-8 text-center sm:grid-cols-3">
-            {d.padrinos.map((p, i) => (
-              <div key={i}>
-                <p style={displayFont} className="text-lg">
-                  {p.nombre}
-                </p>
-                {p.rol && (
-                  <p style={bodyFont} className="mt-1 text-xs tracking-[0.1em] text-[#2c2130]/60 uppercase">
-                    {p.rol}
-                  </p>
-                )}
+      {/* PROGRAMA */}
+      {d.programa && d.programa.length > 0 && (
+        <section style={{ padding: '0 30px 52px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 26 }}>
+            <Eyebrow color={tema.gold}>La noche</Eyebrow>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {d.programa.map((p, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  gap: 18,
+                  alignItems: 'baseline',
+                  padding: '15px 0',
+                  borderBottom: '1px solid rgba(201,162,94,.13)',
+                }}
+              >
+                <span style={{ ...displayFont, fontStyle: 'italic', flex: 'none', width: 56, fontSize: 15, color: tema.gold }}>{p.hora}</span>
+                <span style={{ ...bodyFont, fontWeight: 300, flex: 1, fontSize: 15, letterSpacing: '.02em' }}>{p.titulo}</span>
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* VESTIMENTA */}
+      {d.vestimenta && (
+        <section style={{ padding: '0 30px 52px' }}>
+          <div style={{ border: `1px solid ${BORDER}`, padding: '28px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ ...bodyFont, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: tema.gold }}>Vestimenta</span>
+            <span style={{ ...displayFont, fontSize: 22, lineHeight: '28px' }}>{d.vestimenta}</span>
+            {d.vestimenta_nota && (
+              <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '19px', color: 'rgba(247,241,232,.72)' }}>
+                {d.vestimenta_nota}
+              </span>
+            )}
           </div>
         </section>
       )}
 
       {/* GALERIA */}
       {galeria.length > 0 && (
-        <section className="border-t border-[#2c2130]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs font-semibold tracking-[0.3em] text-[#2c2130]/60 uppercase">
-            Momentos
-          </p>
-          <h2 style={displayFont} className="mt-3 mb-14 text-center text-3xl sm:text-4xl">
-            Galería
-          </h2>
-
-          <div className="mx-auto grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-            {galeria.map((src, i) => (
-              <TemplatePhoto
-                key={i}
-                src={src}
-                alt=""
-                sizes="(min-width: 640px) 33vw, 50vw"
-                className={`relative aspect-square ${i === 0 ? 'col-span-2 row-span-2 aspect-square sm:aspect-auto' : ''}`}
-              />
-            ))}
+        <section style={{ padding: '0 0 52px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 22 }}>
+            <Eyebrow color={tema.gold}>Galería</Eyebrow>
           </div>
-        </section>
-      )}
-
-      {/* MESA DE REGALOS */}
-      {d.opciones && d.opciones.length > 0 && (
-        <section className="border-t border-[#2c2130]/10 px-6 py-20 sm:py-28">
-          <p style={bodyFont} className="text-center text-xs font-semibold tracking-[0.3em] text-[#2c2130]/60 uppercase">
-            Con cariño
-          </p>
-          <h2 style={displayFont} className="mt-3 text-center text-3xl sm:text-4xl">
-            Mesa de regalos
-          </h2>
-          <p style={bodyFont} className="mx-auto mt-4 max-w-sm text-center text-sm text-[#2c2130]/85">
-            Tu presencia es nuestro mejor regalo. Si aún así quieres tener un detalle, aquí puedes encontrarnos.
-          </p>
-
-          <div className="mx-auto mt-10 flex max-w-md flex-col divide-y divide-[#2c2130]/10">
-            {d.opciones.map((op, i) => (
-              <div key={i} className="flex items-center justify-between py-4">
-                <p style={displayFont} className="text-lg">
-                  {op.tienda}
-                </p>
-                {op.url && (
-                  <a
-                    href={op.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={bodyFont}
-                    className="text-xs font-semibold tracking-[0.15em] text-[#2c2130] underline decoration-[#2c2130]/30 underline-offset-4 uppercase"
-                  >
-                    Ver
-                  </a>
-                )}
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 30px 6px' }}>
+            {galeria.map((src, i) => (
+              <div key={i} style={{ flex: 'none', width: 172, height: 230, border: `1px solid rgba(201,162,94,.18)`, position: 'relative' }}>
+                <TemplatePhoto src={src} alt="" sizes="172px" className="absolute inset-0" />
               </div>
             ))}
           </div>
         </section>
       )}
 
+      {/* MESA DE REGALOS */}
+      {d.tiendas && d.tiendas.length > 0 && (
+        <section style={{ padding: '0 30px 52px', textAlign: 'center' }}>
+          <div style={{ border: `1px solid ${BORDER}`, padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.26em', textTransform: 'uppercase', color: tema.gold }}>Mesa de regalos</span>
+            <p style={{ ...bodyFont, fontWeight: 300, fontSize: 14, lineHeight: '22px', color: 'rgba(247,241,232,.7)', textWrap: 'pretty', margin: 0 }}>
+              Tu presencia es mi mejor regalo. Si quieres darme algo más, aquí están mis listas.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, marginTop: 6 }}>
+              {d.tiendas.map((t, i) => (
+                <a
+                  key={i}
+                  href={t.url || undefined}
+                  target={t.url ? '_blank' : undefined}
+                  rel={t.url ? 'noreferrer' : undefined}
+                  style={{
+                    border: `1px solid rgba(201,162,94,.18)`,
+                    padding: '15px 16px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    color: IVORY,
+                  }}
+                >
+                  <span style={{ ...displayFont, fontSize: 16 }}>{t.nombre}</span>
+                  {t.url && (
+                    <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.18em', textTransform: 'uppercase', color: tema.gold }}>
+                      Abrir
+                    </span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* RSVP */}
-      <section className="px-6 py-20 sm:py-28" style={{ backgroundColor: INK }}>
-        <p style={bodyFont} className="text-center text-xs font-semibold tracking-[0.3em] text-[#fbf1ec]/70 uppercase">
-          Confirma tu lugar
-        </p>
-        <h2 style={displayFont} className="mt-3 mb-12 text-center text-3xl text-[#fbf1ec] sm:text-4xl">
-          RSVP
-        </h2>
-        <RsvpForm eventId={eventId} fechaLimite={formatCorto(d.fecha_limite_rsvp)} mensaje={d.mensaje_rsvp} />
+      <section style={{ padding: '0 30px 60px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 22 }}>
+          <Eyebrow color={tema.gold}>Confirma tu asistencia</Eyebrow>
+        </div>
+        <XvAnosRsvp eventId={eventId} gold={tema.gold} dark={tema.dark} pases={pases} fechaLimite={formatCorta(d.fecha_limite_rsvp)} />
       </section>
 
-      {/* CIERRE */}
-      <footer className="px-6 py-12 text-center">
-        <p style={displayFont} className="text-2xl text-[#2c2130]/85">
-          {d.nombre_festejada}
-        </p>
-        <p style={bodyFont} className="mt-2 text-xs font-semibold tracking-[0.2em] text-[#2c2130]/55 uppercase">
-          {formatLargo(d.fecha_evento)}
-        </p>
-      </footer>
+      {/* FIRMA */}
+      <div
+        style={{
+          marginTop: -8,
+          paddingBottom: 44,
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'center',
+          ...displayFont,
+          fontSize: 14,
+          color: 'rgba(247,241,232,.28)',
+        }}
+      >
+        <span>Hecho con Sello</span>
+        <span style={{ width: 4, height: 4, borderRadius: 9999, background: tema.gold, marginLeft: 3 }} />
+      </div>
     </div>
   )
 }

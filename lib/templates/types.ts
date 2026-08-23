@@ -5,6 +5,7 @@ export type FieldType =
   | 'time'
   | 'url'
   | 'select'
+  | 'number'
   | 'group'
   | 'repeater'
   | 'gallery'
@@ -31,6 +32,12 @@ export interface DateField extends BaseField {
 export interface SelectField extends BaseField {
   type: 'select'
   options: { value: string; label: string }[]
+}
+
+export interface NumberField extends BaseField {
+  type: 'number'
+  min?: number
+  max?: number
 }
 
 export interface GroupField extends BaseField {
@@ -73,6 +80,7 @@ export type Field =
   | TextField
   | DateField
   | SelectField
+  | NumberField
   | GroupField
   | RepeaterField
   | GalleryField
