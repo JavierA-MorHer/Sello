@@ -30,13 +30,20 @@ export default async function CrearEventoPage({
     notFound()
   }
 
-  const { data: existingDraft } = await supabase
+  // .maybeSingle() lanza error si hay más de una fila y aquí se ignoraba el
+  // error — si por alguna carrera llegan a existir dos borradores, eso
+  // provocaba crear un tercero en cada visita. order+limit(1) es tolerante:
+  // toma el más reciente y no vuelve a duplicar aunque haya restos viejos.
+  const { data: existingDrafts } = await supabase
     .from('events')
     .select('id, slug, custom_data')
     .eq('owner_id', user.id)
     .eq('template_id', templateId)
     .eq('status', 'draft')
-    .maybeSingle()
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  const existingDraft = existingDrafts?.[0] ?? null
 
   const draft =
     existingDraft ??

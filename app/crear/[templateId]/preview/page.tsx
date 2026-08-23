@@ -36,13 +36,18 @@ export default async function PreviewPage({
     notFound()
   }
 
-  const { data: draft } = await supabase
+  // Ver comentario equivalente en ../page.tsx: tolerante a duplicados en vez
+  // de .maybeSingle(), que fallaba en silencio si había más de un borrador.
+  const { data: drafts } = await supabase
     .from('events')
     .select('custom_data')
     .eq('owner_id', user.id)
     .eq('template_id', templateId)
     .eq('status', 'draft')
-    .maybeSingle()
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  const draft = drafts?.[0]
 
   if (!draft) {
     notFound()
