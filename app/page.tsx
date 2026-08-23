@@ -139,7 +139,7 @@ export default async function LandingPage() {
                     RSVP activo
                   </span>
                   <span className="rounded-full bg-ink/6 px-2.5 py-1 font-body text-[10px] font-semibold text-ink/60">
-                    sello.mx/camila-sebastian
+                    camila-sebastian.sello.com
                   </span>
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default async function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <span>Instagram</span>
             <span>WhatsApp</span>
-            <span>hola@sello.mx</span>
+            <span>hola@sello.com</span>
             <span>Aviso de privacidad</span>
             <span>Términos</span>
           </div>
