@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { signOutAction } from '@/lib/auth/actions'
 
@@ -56,6 +57,8 @@ export function AppMenu({
 }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [coords, setCoords] = useState({ top: 0, right: 0 })
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
   const triggerColor = variant === 'dark' ? 'text-paper hover:bg-paper/10' : 'text-ink hover:bg-ink/5'
 
@@ -63,11 +66,20 @@ export function AppMenu({
     setOpen(false)
   }
 
+  function toggle() {
+    if (!open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect()
+      setCoords({ top: rect.bottom + 8, right: window.innerWidth - rect.right })
+    }
+    setOpen((v) => !v)
+  }
+
   return (
     <div className="relative">
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
         aria-expanded={open}
         className={`flex h-9 w-9 flex-none items-center justify-center rounded-sm transition-colors ${triggerColor}`}
@@ -75,39 +87,45 @@ export function AppMenu({
         {open ? <CloseIcon /> : <HamburgerIcon />}
       </button>
 
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40 bg-ink/30" onClick={close} />
-          <div className="absolute top-full right-0 z-50 mt-2 w-64 rounded-sm border border-ink/10 bg-paper p-2 shadow-xl">
-            {displayName && (
-              <p className="px-3 pt-1.5 pb-2 font-body text-xs text-ink/50">Hola, {displayName}</p>
-            )}
-            <MenuLink href="/" onNavigate={close}>
-              Inicio
-            </MenuLink>
-            <MenuLink href="/plantillas" onNavigate={close}>
-              Plantillas
-            </MenuLink>
-            <MenuLink href="/mis-eventos" onNavigate={close}>
-              Mis eventos
-            </MenuLink>
-            {isAdmin && (
-              <MenuLink href="/admin" onNavigate={close}>
-                Admin
-              </MenuLink>
-            )}
-            <div className="my-1 h-px bg-ink/10" />
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={() => startTransition(() => signOutAction())}
-              className="w-full rounded-sm px-3 py-2.5 text-left font-body text-sm font-semibold text-error transition-colors hover:bg-error/10 disabled:opacity-50"
+      {open &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <>
+            <div className="fixed inset-0 z-40 bg-ink/30" onClick={close} />
+            <div
+              style={{ top: coords.top, right: coords.right }}
+              className="fixed z-50 w-64 rounded-sm border border-ink/10 bg-paper p-2 shadow-xl"
             >
-              {isPending ? 'Cerrando sesión…' : 'Cerrar sesión'}
-            </button>
-          </div>
-        </>
-      )}
+              {displayName && (
+                <p className="px-3 pt-1.5 pb-2 font-body text-xs text-ink/50">Hola, {displayName}</p>
+              )}
+              <MenuLink href="/" onNavigate={close}>
+                Inicio
+              </MenuLink>
+              <MenuLink href="/plantillas" onNavigate={close}>
+                Plantillas
+              </MenuLink>
+              <MenuLink href="/mis-eventos" onNavigate={close}>
+                Mis eventos
+              </MenuLink>
+              {isAdmin && (
+                <MenuLink href="/admin" onNavigate={close}>
+                  Admin
+                </MenuLink>
+              )}
+              <div className="my-1 h-px bg-ink/10" />
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => startTransition(() => signOutAction())}
+                className="w-full rounded-sm px-3 py-2.5 text-left font-body text-sm font-semibold text-error transition-colors hover:bg-error/10 disabled:opacity-50"
+              >
+                {isPending ? 'Cerrando sesión…' : 'Cerrar sesión'}
+              </button>
+            </div>
+          </>,
+          document.body
+        )}
     </div>
   )
 }
