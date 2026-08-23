@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import type { Field, FieldSchema } from '@/lib/templates/types'
 import { DynamicForm } from '@/components/forms/DynamicForm'
 import { AppMenu } from '@/components/nav/AppMenu'
+import { Modal } from '@/components/shared/Modal'
 import { autosaveDraft, createCheckoutSession } from './actions'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
@@ -129,14 +130,14 @@ export function CrearEventoForm({
   const [isPaying, startPayTransition] = useTransition()
   const payError = searchParams.get('error') === 'pago'
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const [missingFieldAlert, setMissingFieldAlert] = useState<{ stepIndex: number; label: string } | null>(null)
 
   const { register, control, watch, getValues } = useForm({ defaultValues })
 
   async function handlePay() {
     const missing = findFirstMissingRequiredStep(schema, getValues())
     if (missing) {
-      window.alert(`Te falta completar "${missing.label}" antes de publicar.`)
-      goToStep(missing.stepIndex)
+      setMissingFieldAlert(missing)
       return
     }
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -332,6 +333,27 @@ export function CrearEventoForm({
           )}
         </div>
       </div>
+
+      {missingFieldAlert && (
+        <Modal
+          title="Falta un paso"
+          onClose={() => setMissingFieldAlert(null)}
+          actions={
+            <button
+              type="button"
+              onClick={() => {
+                goToStep(missingFieldAlert.stepIndex)
+                setMissingFieldAlert(null)
+              }}
+              className="rounded-sm bg-ink px-4 py-2 font-body text-xs font-semibold text-paper transition-colors hover:bg-clay"
+            >
+              Ir al paso
+            </button>
+          }
+        >
+          Te falta completar &ldquo;{missingFieldAlert.label}&rdquo; antes de publicar.
+        </Modal>
+      )}
     </div>
   )
 }
