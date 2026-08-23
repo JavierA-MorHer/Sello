@@ -63,6 +63,28 @@ function SaveStatusLine({ status, errorMessage }: { status: SaveStatus; errorMes
   )
 }
 
+function isFieldEmpty(field: Field, raw: unknown): boolean {
+  if (field.type === 'repeater') {
+    const items = Array.isArray(raw) ? raw.filter((item) => item && Object.values(item).some(Boolean)) : []
+    return items.length === 0
+  }
+  if (field.type === 'gallery') return !Array.isArray(raw) || raw.length === 0
+  return raw === undefined || raw === null || raw === ''
+}
+
+function findFirstMissingRequiredStep(
+  schema: FieldSchema,
+  values: Record<string, unknown>
+): { stepIndex: number; label: string } | null {
+  for (let i = 0; i < schema.sections.length; i++) {
+    const missing = schema.sections[i].fields.find(
+      (field) => field.type !== 'group' && field.type !== 'map' && field.required && isFieldEmpty(field, values[field.key])
+    )
+    if (missing) return { stepIndex: i, label: missing.label }
+  }
+  return null
+}
+
 function daysUntil(iso: unknown): number | null {
   if (typeof iso !== 'string' || !iso) return null
   const target = new Date(`${iso}T00:00:00`)
@@ -111,6 +133,12 @@ export function CrearEventoForm({
   const { register, control, watch, getValues } = useForm({ defaultValues })
 
   async function handlePay() {
+    const missing = findFirstMissingRequiredStep(schema, getValues())
+    if (missing) {
+      window.alert(`Te falta completar "${missing.label}" antes de publicar.`)
+      goToStep(missing.stepIndex)
+      return
+    }
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
     await autosaveDraft(eventId, getValues()).catch(() => {})
     startPayTransition(() => createCheckoutSession(eventId, stepIndex))
