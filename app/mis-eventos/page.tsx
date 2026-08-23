@@ -114,7 +114,15 @@ export default async function MisEventosPage() {
                     )}
                   </div>
 
-                  <div className="flex-none">
+                  <div className="flex flex-none items-center gap-2">
+                    {isPublished && (
+                      <Link
+                        href={`/mis-eventos/${event.id}/invitados`}
+                        className="inline-block rounded-sm border border-ink/20 px-4 py-2 font-body text-xs font-semibold text-ink transition-colors hover:border-clay hover:text-clay"
+                      >
+                        Ver invitados
+                      </Link>
+                    )}
                     {event.status === 'draft' && (
                       <Link
                         href={`/crear/${event.template_id}`}
