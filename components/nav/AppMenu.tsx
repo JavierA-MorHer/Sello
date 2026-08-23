@@ -85,9 +85,6 @@ export function AppMenu({
             <MenuLink href="/" onNavigate={close}>
               Inicio
             </MenuLink>
-            <MenuLink href="/crear" onNavigate={close}>
-              Crear invitación
-            </MenuLink>
             <MenuLink href="/plantillas" onNavigate={close}>
               Plantillas
             </MenuLink>
