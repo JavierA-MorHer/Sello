@@ -7,16 +7,49 @@ import { getPriceMXNForCategory } from '@/lib/templates/pricing'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
+
+/**
+ * Encuentra un slug libre a partir de uno deseado, sin perder el toque
+ * personalizado: si "emiliano" ya existe, prueba "emiliano-2", "emiliano-3"...
+ * en vez de forzar al usuario a inventar otro link a mano.
+ */
+async function resolveUniqueSlug(supabase: SupabaseServerClient, base: string, eventId: string): Promise<string> {
+  const { data: matches } = await supabase
+    .from('events')
+    .select('slug')
+    .neq('id', eventId)
+    .or(`slug.eq.${base},slug.like.${base}-*`)
+
+  const taken = new Set((matches ?? []).map((m) => m.slug))
+  if (!taken.has(base)) return base
+
+  let i = 2
+  while (taken.has(`${base}-${i}`)) i++
+  return `${base}-${i}`
+}
+
 export async function autosaveDraft(eventId: string, data: Record<string, unknown>) {
   const supabase = await createClient()
   const { slug, ...custom_data } = data
   const update: Record<string, unknown> = { custom_data }
 
+  let resolvedSlug: string | undefined
   if (typeof slug === 'string' && slug.trim().length > 0) {
-    update.slug = slug.trim()
+    resolvedSlug = await resolveUniqueSlug(supabase, slug.trim(), eventId)
+    update.slug = resolvedSlug
   }
 
-  const { error } = await supabase.from('events').update(update).eq('id', eventId)
+  let { error } = await supabase.from('events').update(update).eq('id', eventId)
+
+  // Carrera: alguien más tomó el slug resuelto entre el chequeo y el update.
+  // Un solo reintento con un sufijo corto al azar resuelve el caso extremo
+  // sin bloquear al usuario con el mensaje de error.
+  if (error?.code === '23505' && resolvedSlug) {
+    resolvedSlug = `${resolvedSlug}-${Math.random().toString(36).slice(2, 6)}`
+    update.slug = resolvedSlug
+    ;({ error } = await supabase.from('events').update(update).eq('id', eventId))
+  }
 
   if (error) {
     if (error.code === '23505') {
@@ -24,6 +57,8 @@ export async function autosaveDraft(eventId: string, data: Record<string, unknow
     }
     throw new Error('No se pudo guardar el borrador.')
   }
+
+  return { slug: resolvedSlug }
 }
 
 /**

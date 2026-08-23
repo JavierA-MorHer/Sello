@@ -53,7 +53,18 @@ function summarizeSchema(
     .filter((section) => section.rows.length > 0)
 }
 
-function SaveStatusLine({ status, errorMessage }: { status: SaveStatus; errorMessage: string | null }) {
+function SaveStatusLine({
+  status,
+  errorMessage,
+  slugNotice,
+}: {
+  status: SaveStatus
+  errorMessage: string | null
+  slugNotice: string | null
+}) {
+  if (slugNotice) {
+    return <p className="h-4 font-body text-[11px] text-clay">{slugNotice}</p>
+  }
   return (
     <p className="h-4 font-body text-[11px] text-ink/40">
       {status === 'saving' && 'Guardando…'}
@@ -133,8 +144,18 @@ export function CrearEventoForm({
   const payError = searchParams.get('error') === 'pago'
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [missingFieldAlert, setMissingFieldAlert] = useState<{ stepIndex: number; label: string } | null>(null)
+  const [slugNotice, setSlugNotice] = useState<string | null>(null)
+  const slugNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  const { register, control, watch, getValues } = useForm({ defaultValues })
+  const { register, control, watch, getValues, setValue } = useForm({ defaultValues })
+
+  function noteSlugAdjustment(resolvedSlug: string | undefined, requestedSlug: unknown) {
+    if (!resolvedSlug || resolvedSlug === requestedSlug) return
+    setValue('slug', resolvedSlug)
+    setSlugNotice(`Ese link ya estaba en uso — lo ajustamos a "${resolvedSlug}".`)
+    if (slugNoticeTimeoutRef.current) clearTimeout(slugNoticeTimeoutRef.current)
+    slugNoticeTimeoutRef.current = setTimeout(() => setSlugNotice(null), 5000)
+  }
 
   async function handlePay() {
     const missing = findFirstMissingRequiredStep(schema, getValues())
@@ -151,7 +172,8 @@ export function CrearEventoForm({
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
     setStatus('saving')
     try {
-      await autosaveDraft(eventId, getValues())
+      const result = await autosaveDraft(eventId, getValues())
+      noteSlugAdjustment(result?.slug, getValues('slug'))
       setStatus('saved')
     } catch (err) {
       setStatus('error')
@@ -167,7 +189,8 @@ export function CrearEventoForm({
       timeoutRef.current = setTimeout(async () => {
         setStatus('saving')
         try {
-          await autosaveDraft(eventId, values as Record<string, unknown>)
+          const result = await autosaveDraft(eventId, values as Record<string, unknown>)
+          noteSlugAdjustment(result?.slug, (values as Record<string, unknown>).slug)
           setStatus('saved')
           setErrorMessage(null)
         } catch (err) {
@@ -180,6 +203,7 @@ export function CrearEventoForm({
     return () => {
       subscription.unsubscribe()
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      if (slugNoticeTimeoutRef.current) clearTimeout(slugNoticeTimeoutRef.current)
     }
   }, [watch, eventId])
 
@@ -230,7 +254,7 @@ export function CrearEventoForm({
             ))}
           </div>
 
-          <SaveStatusLine status={status} errorMessage={errorMessage} />
+          <SaveStatusLine status={status} errorMessage={errorMessage} slugNotice={slugNotice} />
         </div>
       </div>
 
