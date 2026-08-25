@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getPriceRangeForCategory } from '@/lib/templates/pricing'
+import { formatMXN, minPriceMXN } from '@/lib/templates/pricing'
 import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { RotatingHero, type HeroSlide } from '@/components/marketing/RotatingHero'
 import { AppMenu } from '@/components/nav/AppMenu'
@@ -77,16 +77,22 @@ function PlusIcon({ className }: { className?: string }) {
 
 export default async function LandingPage() {
   const supabase = await createClient()
-  const [{ data: templates }, { data: userData }] = await Promise.all([
+  const [{ data: allTemplates }, { data: userData }] = await Promise.all([
     supabase
       .from('templates')
-      .select('id, name, category')
+      .select('id, name, category, price_mxn')
       .eq('active', true)
-      .order('created_at', { ascending: true })
-      .limit(6),
+      .order('created_at', { ascending: true }),
     supabase.auth.getUser(),
   ])
   const user = userData.user
+  const templates = (allTemplates ?? []).slice(0, 6)
+
+  const desdeBoda = minPriceMXN(allTemplates ?? [], 'boda')
+  const otrasPrecios = ['xv_anos', 'bautizo', 'baby_shower', 'generico']
+    .map((c) => minPriceMXN(allTemplates ?? [], c))
+    .filter((p): p is number => p !== null)
+  const desdeOtras = otrasPrecios.length > 0 ? Math.min(...otrasPrecios) : null
 
   const metadataName =
     typeof user?.user_metadata?.full_name === 'string'
@@ -220,8 +226,7 @@ export default async function LandingPage() {
               <TemplateCard
                 key={template.id}
                 name={template.name}
-                tag={template.category}
-                priceRange={getPriceRangeForCategory(template.category)}
+                priceRange={formatMXN(template.price_mxn)}
                 href={`/crear/${template.id}`}
                 className="w-[150px] shrink-0 sm:w-auto"
               />
@@ -242,18 +247,22 @@ export default async function LandingPage() {
               Precio
             </span>
             <div className="flex flex-wrap items-baseline gap-x-10 gap-y-6 border-b border-paper/10 pb-8">
-              <div>
-                <div className="font-display text-3xl">{getPriceRangeForCategory('boda')}</div>
-                <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                  Boda · MXN, pago único
+              {desdeBoda !== null && (
+                <div>
+                  <div className="font-display text-3xl">Desde {formatMXN(desdeBoda)}</div>
+                  <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
+                    Boda · MXN, pago único
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="font-display text-3xl">{getPriceRangeForCategory('xv_anos')}</div>
-                <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                  XV años, bautizos y más
+              )}
+              {desdeOtras !== null && (
+                <div>
+                  <div className="font-display text-3xl">Desde {formatMXN(desdeOtras)}</div>
+                  <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
+                    XV años, bautizos y más
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {INCLUYE.map((item) => (

@@ -36,7 +36,11 @@ export async function POST(request: Request) {
     const eventId = session.metadata?.event_id
 
     if (eventId) {
-      await activateEvent(eventId)
+      // amount_total viene de Stripe, ya confirmado y cobrado — es la única
+      // fuente confiable del monto pagado. No se recalcula a partir del
+      // precio actual de la plantilla, que pudo cambiar después.
+      const amountTotal = typeof session.amount_total === 'number' ? session.amount_total : null
+      await activateEvent(eventId, amountTotal !== null ? Math.round(amountTotal / 100) : null)
     } else {
       console.error('[stripe webhook] checkout.session.completed sin metadata.event_id')
     }
@@ -45,7 +49,7 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true })
 }
 
-async function activateEvent(eventId: string) {
+async function activateEvent(eventId: string, pricePaidMXN: number | null) {
   const supabase = createAdminClient()
 
   const { data: eventRow } = await supabase
@@ -67,6 +71,7 @@ async function activateEvent(eventId: string) {
       status: 'active',
       paid_at: new Date().toISOString(),
       expires_at: computeExpiresAt(fechaEvento).toISOString(),
+      price_paid_mxn: pricePaidMXN,
     })
     .eq('id', eventId)
 

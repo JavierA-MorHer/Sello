@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getEventTitle } from '@/lib/templates/summary'
-import { getPriceMXNForCategory } from '@/lib/templates/pricing'
 import { AppMenu } from '@/components/nav/AppMenu'
 
 const STATUS_ORDER = ['draft', 'active', 'expiring_soon', 'expired', 'archived'] as const
@@ -27,10 +26,10 @@ export default async function AdminPage() {
 
   const { data: events } = await supabase
     .from('events')
-    .select('id, status, template_id, custom_data, created_at, paid_at')
+    .select('id, status, template_id, custom_data, created_at, paid_at, price_paid_mxn')
     .order('created_at', { ascending: false })
 
-  const { data: templates } = await supabase.from('templates').select('id, name, category')
+  const { data: templates } = await supabase.from('templates').select('id, name, category, price_mxn')
   const templateById = new Map((templates ?? []).map((t) => [t.id, t]))
 
   const counts: Record<string, number> = { draft: 0, active: 0, expiring_soon: 0, expired: 0, archived: 0 }
@@ -39,8 +38,10 @@ export default async function AdminPage() {
   for (const event of events ?? []) {
     counts[event.status] = (counts[event.status] ?? 0) + 1
     if (event.paid_at) {
-      const category = templateById.get(event.template_id)?.category ?? 'generico'
-      revenueMXN += getPriceMXNForCategory(category)
+      // price_paid_mxn es el monto real confirmado por Stripe (guardado por
+      // el webhook). Solo se usa el precio actual de la plantilla como
+      // respaldo para eventos activados antes de que existiera esa columna.
+      revenueMXN += event.price_paid_mxn ?? templateById.get(event.template_id)?.price_mxn ?? 0
     }
   }
 
@@ -70,7 +71,7 @@ export default async function AdminPage() {
 
         <div className="mt-4 rounded-sm bg-ink p-6 text-paper">
           <p className="font-body text-[11px] font-semibold tracking-[0.08em] text-paper/60 uppercase">
-            Ingresos totales (estimado, precio fijo por categoría)
+            Ingresos totales (monto real cobrado por Stripe)
           </p>
           <p className="mt-1 font-display text-3xl">${revenueMXN.toLocaleString('es-MX')} MXN</p>
         </div>

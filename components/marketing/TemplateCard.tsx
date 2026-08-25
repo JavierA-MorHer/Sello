@@ -8,14 +8,12 @@ import Link from 'next/link'
  */
 export function TemplateCard({
   name,
-  tag,
   priceRange,
   href,
   comingSoon = false,
   className = '',
 }: {
   name: string
-  tag: string
   priceRange: string
   href?: string
   comingSoon?: boolean
@@ -32,8 +30,6 @@ export function TemplateCard({
       >
         <div className="absolute inset-2.5 flex flex-col items-center justify-center gap-2 rounded-[3px] border border-clay/40 px-3 text-center">
           <span className="font-display text-base leading-tight">{name}</span>
-          <div className="h-px w-4 bg-ink/20" />
-          <span className="text-[9px] tracking-[0.14em] text-ink/60 uppercase">{tag}</span>
         </div>
         <span
           className={`absolute right-2.5 top-2.5 rounded-full px-2 py-1 text-[9px] font-semibold tracking-[0.08em] ${
@@ -45,7 +41,6 @@ export function TemplateCard({
       </div>
       <div className="flex flex-col gap-0.5 px-0.5">
         <span className="font-body text-sm font-semibold text-ink">{name}</span>
-        <span className="font-body text-xs text-ink/50">{tag}</span>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { FieldSchema } from '@/lib/templates/types'
-import { getPriceRangeForCategory } from '@/lib/templates/pricing'
+import { formatMXN } from '@/lib/templates/pricing'
 import { CrearEventoForm } from './crear-evento-form'
 
 export default async function CrearEventoPage({
@@ -22,7 +22,7 @@ export default async function CrearEventoPage({
 
   const { data: template } = await supabase
     .from('templates')
-    .select('id, category, field_schema')
+    .select('id, category, field_schema, price_mxn')
     .eq('id', templateId)
     .single()
 
@@ -76,7 +76,7 @@ export default async function CrearEventoPage({
       <CrearEventoForm
         eventId={draft.id}
         templateId={templateId}
-        priceRange={getPriceRangeForCategory(template.category)}
+        priceRange={formatMXN(template.price_mxn)}
         schema={template.field_schema as FieldSchema}
         defaultValues={{
           ...(draft.custom_data as Record<string, unknown>),

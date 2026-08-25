@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getPriceRangeForCategory } from '@/lib/templates/pricing'
+import { formatMXN } from '@/lib/templates/pricing'
 import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { AppMenu } from '@/components/nav/AppMenu'
 
@@ -19,7 +19,7 @@ export default async function PlantillasPage() {
 
   const { data: templates } = await supabase
     .from('templates')
-    .select('id, name, category')
+    .select('id, name, category, price_mxn')
     .eq('active', true)
     .order('created_at', { ascending: true })
 
@@ -52,14 +52,13 @@ export default async function PlantillasPage() {
             <TemplateCard
               key={template.id}
               name={template.name}
-              tag={template.category}
-              priceRange={getPriceRangeForCategory(template.category)}
+              priceRange={formatMXN(template.price_mxn)}
               href={`/crear/${template.id}`}
             />
           ))}
 
           {COMING_SOON.map((name) => (
-            <TemplateCard key={name} name={name} tag="Próximamente" priceRange="" comingSoon />
+            <TemplateCard key={name} name={name} priceRange="" comingSoon />
           ))}
         </div>
       </div>

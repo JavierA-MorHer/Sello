@@ -1,12 +1,14 @@
-export function getPriceRangeForCategory(category: string): string {
-  return category === 'boda' ? '$700–1,200' : '$500–900'
+/** Formatea un precio en pesos mexicanos, ej. `formatMXN(900)` → "$900 MXN". */
+export function formatMXN(priceMXN: number): string {
+  return `$${priceMXN.toLocaleString('es-MX')} MXN`
 }
 
 /**
- * Precio fijo a cobrar (MXN, pesos enteros) — Checkout necesita un monto
- * exacto, no un rango. Elegido dentro del rango de `getPriceRangeForCategory`;
- * ajústalo aquí si cambian los precios de lanzamiento.
+ * Menor precio entre plantillas activas de una categoría, para mostrar
+ * "Desde $X MXN" sin inventar un rango — cada plantilla ya trae su propio
+ * `price_mxn` real desde la base de datos (ver supabase/add-template-pricing.sql).
  */
-export function getPriceMXNForCategory(category: string): number {
-  return category === 'boda' ? 900 : 700
+export function minPriceMXN(templates: { category: string; price_mxn: number }[], category: string): number | null {
+  const prices = templates.filter((t) => t.category === category).map((t) => t.price_mxn)
+  return prices.length > 0 ? Math.min(...prices) : null
 }

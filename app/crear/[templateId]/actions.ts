@@ -3,7 +3,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/server'
-import { getPriceMXNForCategory } from '@/lib/templates/pricing'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -95,18 +94,22 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
 
   const { data: template } = await supabase
     .from('templates')
-    .select('category, name')
+    .select('name, price_mxn')
     .eq('id', templateId)
     .single()
 
-  if (!template) {
+  // El precio nunca viene del cliente: se lee server-side de `templates`
+  // justo antes de crear la sesión de Stripe. Si por alguna razón el precio
+  // no es un entero positivo (dato corrupto, plantilla mal cargada), se
+  // aborta en vez de cobrar un monto inválido o $0.
+  if (!template || !Number.isInteger(template.price_mxn) || template.price_mxn <= 0) {
     redirect(`/crear/${templateId}?paso=${reviewStepIndex}&error=pago`)
   }
 
   let checkoutUrl: string
   try {
     const stripe = getStripe()
-    const priceMXN = getPriceMXNForCategory(template.category)
+    const priceMXN = template.price_mxn
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
