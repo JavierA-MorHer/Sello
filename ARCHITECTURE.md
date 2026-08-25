@@ -104,8 +104,8 @@ using (event_id in (select id from events where owner_id = auth.uid()));
 
 ## 4. Subdominios por evento
 
-- DNS wildcard: `*.sello.com` → `CNAME` a `cname.vercel-dns.com`.
-- En Vercel (Project Settings → Domains): agregar `*.sello.com` una sola vez. Vercel emite y renueva SSL automáticamente por subdominio.
+- DNS wildcard: `*.misello.com.mx` → `CNAME` a `cname.vercel-dns.com`.
+- En Vercel (Project Settings → Domains): agregar `*.misello.com.mx` una sola vez. Vercel emite y renueva SSL automáticamente por subdominio.
 - `middleware.ts` extrae el subdominio del `host` y reescribe la ruta internamente hacia `/evento/[slug]`, sin exponer esa ruta al usuario:
 
 ```typescript
@@ -116,11 +116,11 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
 
-  if (hostname === 'sello.com' || hostname === 'www.sello.com') {
+  if (hostname === 'misello.com.mx' || hostname === 'www.misello.com.mx') {
     return NextResponse.next() // landing de marketing
   }
 
-  const slug = hostname.replace('.sello.com', '')
+  const slug = hostname.replace('.misello.com.mx', '')
   const url = request.nextUrl.clone()
   url.pathname = `/evento/${slug}${url.pathname}`
   return NextResponse.rewrite(url)
@@ -144,7 +144,7 @@ export const config = {
 // Enviar magic link
 await supabase.auth.signInWithOtp({
   email: userEmail,
-  options: { emailRedirectTo: 'https://sello.com/auth/callback' }
+  options: { emailRedirectTo: 'https://misello.com.mx/auth/callback' }
 })
 ```
 
@@ -187,7 +187,7 @@ Job diario (Supabase Edge Function programada con `pg_cron` o Supabase Cron):
 - Landing de marketing con SSR/SSG y `Metadata API` de Next.js por página.
 - `app/sitemap.ts` y `app/robots.ts` generados automáticamente.
 - Schema markup (JSON-LD) para producto y FAQ.
-- Los subdominios de eventos (`slug.sello.com`) llevan `noindex` — no deben indexarse.
+- Los subdominios de eventos (`slug.misello.com.mx`) llevan `noindex` — no deben indexarse.
 
 ## 10. Estructura de carpetas propuesta
 

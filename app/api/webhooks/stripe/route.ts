@@ -7,7 +7,7 @@ import { paymentConfirmationEmail } from '@/lib/email/templates'
 import { computeExpiresAt } from '@/lib/events/expiration'
 import { getEventTitle } from '@/lib/templates/summary'
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'misello.com.mx'
 
 // Prueba local: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
 // (te da un STRIPE_WEBHOOK_SECRET temporal para .env.local).

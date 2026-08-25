@@ -6,7 +6,7 @@ import { AppMenu } from '@/components/nav/AppMenu'
 import { CopyShareActions } from '@/components/shared/CopyShareActions'
 import { getEventTitle } from '@/lib/templates/summary'
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'misello.com.mx'
 
 export default async function CheckoutSuccessPage({
   params,

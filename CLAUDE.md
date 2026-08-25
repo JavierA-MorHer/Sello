@@ -4,7 +4,7 @@ Este archivo le da contexto a Claude Code al trabajar en este repositorio. Coló
 
 ## Qué es este proyecto
 
-Plataforma self-service de invitaciones digitales (bodas, XV años, bautizos, eventos). El cliente elige una plantilla, llena un formulario con sus datos, ve un preview, paga una vez, y recibe un enlace único (`slug.sello.com`) para compartir con sus invitados, quienes confirman asistencia (RSVP).
+Plataforma self-service de invitaciones digitales (bodas, XV años, bautizos, eventos). El cliente elige una plantilla, llena un formulario con sus datos, ve un preview, paga una vez, y recibe un enlace único (`slug.misello.com.mx`) para compartir con sus invitados, quienes confirman asistencia (RSVP).
 
 Documentación completa:
 - `docs/PRODUCT.md` — qué se construye y por qué (leer primero si hay dudas de producto)
@@ -54,7 +54,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe   # probar webhook
 - [x] Preview conectado — usa el mismo componente de plantilla, con marca de agua
 - [x] Storage de fotos (bucket `event-photos` + políticas RLS)
 - [x] Stripe Checkout + webhook de activación (`app/api/webhooks/stripe`) — código completo, **solo faltan las API keys reales** en `.env.local` (ver `.env.example`)
-- [x] Decisión de dominio: el link del invitado es `slug.sello.com` (subdominio) — `proxy.ts` detecta el subdominio y reescribe a `/evento/{slug}`
+- [x] Decisión de dominio: el link del invitado es `slug.misello.com.mx` (subdominio) — `proxy.ts` detecta el subdominio y reescribe a `/evento/{slug}`
 - [x] Página pública del invitado (`app/evento/[slug]/page.tsx`)
 - [x] RLS pública para lectura de eventos por slug (`supabase/rls-public-event-read.sql`)
 - [x] RSVP real — `RsvpForm` guarda en `guests`/`rsvp_responses` vía `lib/rsvp/actions.ts`
@@ -67,11 +67,13 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe   # probar webhook
 
 ## Pendientes que requieren acceso externo (no resolubles por Claude Code)
 
-- **Pegar las API keys reales de Stripe** (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) y de ser necesario `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — ver comentarios en `.env.example`.
-- **Correr `supabase/rls-public-event-read.sql`** en el SQL Editor de Supabase si no se ha corrido aún — crear políticas RLS requiere SQL directo, no se puede hacer vía la API REST con la service role key.
-- **Configurar el cron en Vercel**: agregar la env var `CRON_SECRET` (ya generada en `.env.local`) en el proyecto de Vercel — Vercel Cron la manda automáticamente como header `Authorization: Bearer`.
-- **DNS wildcard** `*.sello.com` → Vercel (`ARCHITECTURE.md` §4) — necesita acceso al registrador del dominio.
-- **Verificar dominio en Resend** para poder usar `hola@sello.com` como remitente en vez del `onboarding@resend.dev` de prueba.
+- [x] API keys reales de Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`) puestas en `.env.local`
+- [x] `supabase/rls-public-event-read.sql` corrido en el SQL Editor de Supabase
+- [x] `CRON_SECRET` configurado en el proyecto de Vercel (confirmado por el usuario 2026-08-24)
+- [x] Dominio comprado: `misello.com.mx` en Hostinger. Nameservers delegados a Vercel DNS (`ns1.vercel-dns.com`/`ns2.vercel-dns.com`). `misello.com.mx` y `*.misello.com.mx` verificados en Vercel, DNS propagado y HTTPS respondiendo 200 (confirmado 2026-08-24).
+- [x] Código y docs actualizados de `sello.com` a `misello.com.mx`: `.env.local` (`NEXT_PUBLIC_ROOT_DOMAIN`), `proxy.ts`, `slug-field.tsx`, páginas de éxito/mis-eventos, cron y webhook de Stripe, `resend.ts`, `app/page.tsx`, `ARCHITECTURE.md`, `PRODUCT.md`. **Falta**: setear `NEXT_PUBLIC_ROOT_DOMAIN=misello.com.mx` también en las env vars del proyecto en Vercel (no solo en `.env.local`).
+- **Verificar dominio en Resend** para poder usar `hola@misello.com.mx` como remitente en vez del `onboarding@resend.dev` de prueba.
 - **Google OAuth "profesional"** (nombre "Sello", logo, dominio verificado) — ver guía dada en conversación; es 100% configuración en Google Cloud Console + Supabase Dashboard.
+- **Vercel plan Hobby (free) actual no permite uso comercial** según sus términos — antes de cobrar clientes reales hay que subir a plan Pro.
 
 Actualiza esta lista conforme avances — ayuda a retomar contexto en sesiones futuras.

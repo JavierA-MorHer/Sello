@@ -5,7 +5,7 @@ import { AppMenu } from '@/components/nav/AppMenu'
 import { getEventTitle } from '@/lib/templates/summary'
 import { DeleteDraftButton } from './delete-draft-button'
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'misello.com.mx'
 const PUBLISHED_STATUSES = ['active', 'expiring_soon']
 
 const STATUS_LABEL: Record<string, string> = {

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'sello.com'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'misello.com.mx'
 
 function getSubdomain(hostname: string): string | null {
   if (hostname === ROOT_DOMAIN || hostname === `www.${ROOT_DOMAIN}`) return null

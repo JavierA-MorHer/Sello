@@ -5,7 +5,7 @@ import { useController, useWatch, type Control } from 'react-hook-form'
 import type { SlugField as SlugFieldType } from '@/lib/templates/types'
 import { slugify } from '@/lib/text/slugify'
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'misello.com.mx'
 
 export function SlugField({
   field,

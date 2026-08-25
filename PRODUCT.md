@@ -40,7 +40,7 @@ Plataforma self-service donde una persona arma, en minutos, la invitación digit
 3. Ve un **preview en vivo** — el mismo componente que verán los invitados, con marca de agua hasta que pague.
 4. Paga una sola vez (Stripe o Mercado Pago).
 5. Al confirmarse el pago (webhook), el evento se activa: se genera el enlace definitivo y desaparece la marca de agua.
-6. El cliente comparte su enlace único (`slug.sello.com`).
+6. El cliente comparte su enlace único (`slug.misello.com.mx`).
 7. Los invitados entran, ven la invitación y confirman asistencia (RSVP).
 8. El cliente recibe una notificación (email) por cada confirmación, y puede ver el detalle en su panel.
 
@@ -51,7 +51,7 @@ Plataforma self-service donde una persona arma, en minutos, la invitación digit
 - Formulario dinámico por plantilla con autosave
 - Preview en vivo con marca de agua antes de pagar
 - Pago único vía Stripe (o Mercado Pago)
-- Subdominio automático por evento (`slug.sello.com`)
+- Subdominio automático por evento (`slug.misello.com.mx`)
 - RSVP público para invitados (sin login)
 - Notificación por email al dueño del evento en cada RSVP
 - Panel del cliente: lista de invitados, estado de RSVP, exportar CSV, editar datos básicos

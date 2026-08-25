@@ -4,7 +4,7 @@ import { sendEmail } from '@/lib/email/resend'
 import { expiryWarningEmail } from '@/lib/email/templates'
 import { getEventTitle } from '@/lib/templates/summary'
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'sello.com'
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'misello.com.mx'
 const DAY_MS = 86_400_000
 
 type ExpiringEvent = {
