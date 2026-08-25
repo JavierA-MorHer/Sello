@@ -16,7 +16,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-const TITLE = "Sello — invitaciones digitales que funcionan de verdad";
+const TITLE = "Sello — tu invitación digital, lista para compartir";
 const DESCRIPTION =
   "Arma tu invitación de boda, XV años, bautizo o baby shower en minutos. Contestas unas preguntas y tu invitación queda lista para compartir por WhatsApp, con confirmación de asistencia real.";
 

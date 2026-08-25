@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formatMXN, minPriceMXN } from '@/lib/templates/pricing'
 import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { RotatingHero, type HeroSlide } from '@/components/marketing/RotatingHero'
+import { FeedbackForm } from '@/components/marketing/FeedbackForm'
 import { AppMenu } from '@/components/nav/AppMenu'
 
 const HERO_SLIDES: HeroSlide[] = [
@@ -227,7 +228,7 @@ export default async function LandingPage() {
                 key={template.id}
                 name={template.name}
                 priceRange={formatMXN(template.price_mxn)}
-                href={`/crear/${template.id}`}
+                templateId={template.id}
                 className="w-[150px] shrink-0 sm:w-auto"
               />
             ))}
@@ -301,6 +302,24 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* DUDAS / FEEDBACK */}
+      <section id="contacto" className="border-t border-ink/6 bg-paper-2 px-4 py-20 sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-2xl">
+          <span className="font-body text-xs font-semibold tracking-[0.16em] text-ink/50 uppercase">
+            Contacto
+          </span>
+          <h2 className="mt-3 font-display text-3xl sm:text-4xl">¿Te quedó una duda?</h2>
+          <p className="mt-3 font-body text-base leading-relaxed text-ink/70">
+            Escríbenos y te contestamos. Si algo te gustaría que Sello hiciera y
+            todavía no lo hace, también queremos saberlo.
+          </p>
+
+          <div className="mt-8">
+            <FeedbackForm />
+          </div>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
       <section className="border-t border-ink/6 px-4 py-20 text-center sm:px-6 sm:py-24">
         <h2 className="mx-auto max-w-lg font-display text-3xl sm:text-4xl">Sella tu invitación hoy.</h2>
@@ -319,7 +338,9 @@ export default async function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <span>Instagram</span>
             <span>WhatsApp</span>
-            <span>hola@misello.com.mx</span>
+            <a href="#contacto" className="transition-colors hover:text-ink">
+              Contacto
+            </a>
             <span>Aviso de privacidad</span>
             <span>Términos</span>
           </div>

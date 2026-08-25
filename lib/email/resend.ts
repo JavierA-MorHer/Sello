@@ -22,11 +22,17 @@ function getResend(): Resend | null {
  * correo como "best effort", nunca como condición para completar un pago o
  * un RSVP.
  */
-export async function sendEmail(params: { to: string; subject: string; html: string }) {
+export async function sendEmail(params: {
+  to: string
+  subject: string
+  html: string
+  /** Para que al responder el correo la respuesta vaya a esta dirección y no al remitente. */
+  replyTo?: string
+}) {
   const resend = getResend()
   if (!resend) {
     console.warn('[email] RESEND_API_KEY no configurada — correo no enviado:', params.subject)
-    return
+    return { ok: false as const }
   }
 
   const { error } = await resend.emails.send({
@@ -34,9 +40,13 @@ export async function sendEmail(params: { to: string; subject: string; html: str
     to: params.to,
     subject: params.subject,
     html: params.html,
+    ...(params.replyTo ? { replyTo: params.replyTo } : {}),
   })
 
   if (error) {
     console.error('[email] Error enviando correo:', error)
+    return { ok: false as const }
   }
+
+  return { ok: true as const }
 }

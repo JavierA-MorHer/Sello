@@ -5,6 +5,51 @@ const CARD_STYLE =
 const BUTTON_STYLE =
   'display: inline-block; margin-top: 20px; background: #1c1b1b; color: #fdf8f8; text-decoration: none; padding: 14px 24px; border-radius: 4px; font-weight: 600;'
 
+/**
+ * Escapa texto que viene de un formulario público antes de meterlo al HTML
+ * del correo. Sin esto, el mensaje de un tercero podría inyectar markup en
+ * la bandeja de quien lo lee.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+export function feedbackEmail({
+  name,
+  email,
+  message,
+}: {
+  name: string
+  email: string
+  message: string
+}) {
+  const safeName = escapeHtml(name)
+  const safeEmail = escapeHtml(email)
+  // El mensaje es texto plano: se escapa y solo se respetan los saltos de línea.
+  const safeMessage = escapeHtml(message).replace(/\n/g, '<br />')
+
+  return {
+    subject: `Feedback de ${safeName}`,
+    html: `
+      <div style="${WRAPPER_STYLE}">
+        <div style="${CARD_STYLE}">
+          <p style="font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #a8927e; font-weight: 600;">Sello · feedback</p>
+          <h1 style="font-size: 22px; margin: 8px 0 16px;">${safeName} escribió</h1>
+          <p style="font-size: 15px; line-height: 22px; color: #444748;">${safeMessage}</p>
+          <p style="font-size: 13px; color: #747878; margin-top: 24px;">
+            Responde a este correo para contestarle directo a ${safeEmail}.
+          </p>
+        </div>
+      </div>
+    `,
+  }
+}
+
 export function paymentConfirmationEmail({ eventName, link }: { eventName: string; link: string }) {
   return {
     subject: `Tu invitación "${eventName}" ya está publicada`,

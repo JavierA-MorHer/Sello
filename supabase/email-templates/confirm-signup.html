@@ -1,0 +1,35 @@
+<!--
+  Template "Confirm signup" de Supabase Auth.
+  Pegar en: Supabase Dashboard → Authentication → Email Templates → Confirm signup.
+
+  Asunto sugerido:
+    Confirma tu correo para entrar a Sello
+
+  Por qué importa: el login usa signInWithOtp (app/login/page.tsx). Con un
+  correo que YA existe, Supabase manda el template "Magic Link"; con uno
+  NUEVO manda este. Si solo se traduce el otro, los usuarios nuevos reciben
+  el correo genérico en inglés.
+-->
+<div style="font-family: Georgia, serif; background: #fdf8f8; color: #1c1b1b; padding: 40px 24px;">
+  <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 32px; border: 1px solid rgba(28,27,27,.08);">
+    <p style="font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #a8927e; font-weight: 600; margin: 0;">Sello</p>
+    <h1 style="font-size: 22px; margin: 8px 0 16px;">Bienvenido a Sello</h1>
+    <p style="font-size: 15px; line-height: 22px; color: #444748; margin: 0;">
+      Confirma tu correo para empezar a armar tu invitación. El enlace sirve
+      una sola vez y caduca en una hora.
+    </p>
+    <a
+      href="{{ .ConfirmationURL }}"
+      style="display: inline-block; margin-top: 20px; background: #1c1b1b; color: #fdf8f8; text-decoration: none; padding: 14px 24px; border-radius: 4px; font-weight: 600;"
+    >
+      Confirmar mi correo
+    </a>
+    <p style="font-size: 13px; color: #747878; margin-top: 24px; line-height: 20px;">
+      Si el botón no funciona, copia y pega esta dirección en tu navegador:<br />
+      {{ .ConfirmationURL }}
+    </p>
+    <p style="font-size: 13px; color: #747878; margin-top: 20px; line-height: 20px;">
+      ¿No fuiste tú? Puedes ignorar este correo, no se creará ninguna cuenta.
+    </p>
+  </div>
+</div>

@@ -53,7 +53,7 @@ export default async function PlantillasPage() {
               key={template.id}
               name={template.name}
               priceRange={formatMXN(template.price_mxn)}
-              href={`/crear/${template.id}`}
+              templateId={template.id}
             />
           ))}
 
