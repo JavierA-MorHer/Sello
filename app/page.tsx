@@ -16,28 +16,28 @@ const HERO_SLIDES: HeroSlide[] = [
 const STEPS = [
   {
     n: '1',
-    title: 'Eliges tu plantilla',
-    body: 'Formal, moderna o cálida. Todas se ven bien en el celular.',
+    title: 'Elige tu estilo',
+    body: 'Formal, moderna o cálida: cada plantilla ya luce impecable, tú solo eliges la que se sienta como tu evento.',
   },
   {
     n: '2',
-    title: 'Llenas el formulario',
-    body: 'Pasos cortos con autosave: nombres, fecha, lugar, fotos y dedicatoria.',
+    title: 'Cuenta tu historia',
+    body: 'Nombres, fecha, lugar, fotos y las palabras que quieras dedicar. Avanza a tu ritmo — si te vas a medio camino, todo sigue ahí cuando regreses.',
   },
   {
     n: '3',
-    title: 'Pagas y compartes',
-    body: 'Un solo pago libera tu link. Lo mandas por WhatsApp y listo.',
+    title: 'Comparte tu sello',
+    body: 'Un solo pago y tu invitación queda lista para mandar por WhatsApp.',
   },
 ]
 
 const INCLUYE = [
-  'Formulario dinámico con autosave — cierra y retoma cuando quieras',
+  'Avanza a tu ritmo — cierra y retoma cuando quieras, nada se pierde',
   'Vista previa idéntica a la invitación final, antes de pagar',
-  'Confirmación de asistencia (RSVP) en tiempo real',
-  'Enlace único para compartir por WhatsApp',
+  'Sabes quién confirma, al momento',
+  'Un enlace propio, listo para compartir por WhatsApp',
   'Cambios ilimitados hasta la fecha de tu evento',
-  'Pago único — sin suscripción ni renovaciones',
+  'Pago único, sin sorpresas ni renovaciones',
 ]
 
 const FAQS = [
@@ -149,7 +149,7 @@ export default async function LandingPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <span className="font-display text-xl leading-none sm:text-2xl">
-                  Camila <span className="italic text-ink/50">&amp;</span> Sebastián
+                  Javier <span className="italic text-ink/50">&amp;</span> Nayeli
                 </span>
                 <span className="font-body text-sm text-ink/70">3 de octubre, 2026 · Mérida</span>
                 <div className="mt-1 flex gap-2">
@@ -157,7 +157,7 @@ export default async function LandingPage() {
                     RSVP activo
                   </span>
                   <span className="rounded-full bg-ink/6 px-2.5 py-1 font-body text-[10px] font-semibold text-ink/60">
-                    camila-sebastian.misello.com.mx
+                    javier-nayeli.misello.com.mx
                   </span>
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default async function LandingPage() {
             Cómo funciona
           </span>
           <h2 className="mt-3 max-w-lg font-display text-3xl sm:text-4xl">
-            De la plantilla al enlace, en tres pasos.
+            Tres pasos para sellarlo.
           </h2>
 
           <div className="mt-14 grid gap-10 sm:grid-cols-3">
