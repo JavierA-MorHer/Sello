@@ -159,12 +159,14 @@ export function FieldRenderer({
         </div>
       )
 
+    // No va dentro de un <label>: las sugerencias son botones, y un label
+    // padre redirige su clic al input.
     case 'slug':
       return (
-        <label className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5">
           <span className={labelClass}>{labelText}</span>
-          <SlugField field={field} name={name} control={control} />
-        </label>
+          <SlugField field={field} name={name} control={control} eventId={eventId} />
+        </div>
       )
 
     case 'ubicacion':

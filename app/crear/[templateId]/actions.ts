@@ -3,61 +3,58 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/server'
+import { slugify } from '@/lib/text/slugify'
+import { findSlugBlocker, releaseOwnDraftSlug } from '@/lib/events/slug'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
-
 /**
- * Encuentra un slug libre a partir de uno deseado, sin perder el toque
- * personalizado: si "emiliano" ya existe, prueba "emiliano-2", "emiliano-3"...
- * en vez de forzar al usuario a inventar otro link a mano.
+ * Guarda el borrador. Si el link deseado ya lo tiene alguien más, se guarda
+ * todo lo demás y se devuelve `slugTaken` para que el formulario lo diga de
+ * frente — nunca se le cambia el link al cliente a sus espaldas (un sufijo
+ * tipo "-2" se descubre hasta que ya lo compartió).
  */
-async function resolveUniqueSlug(supabase: SupabaseServerClient, base: string, eventId: string): Promise<string> {
-  const { data: matches } = await supabase
-    .from('events')
-    .select('slug')
-    .neq('id', eventId)
-    .or(`slug.eq.${base},slug.like.${base}-*`)
-
-  const taken = new Set((matches ?? []).map((m) => m.slug))
-  if (!taken.has(base)) return base
-
-  let i = 2
-  while (taken.has(`${base}-${i}`)) i++
-  return `${base}-${i}`
-}
-
 export async function autosaveDraft(eventId: string, data: Record<string, unknown>) {
   const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('Tu sesión expiró. Vuelve a entrar para seguir guardando.')
+  }
+
   const { slug, ...custom_data } = data
   const update: Record<string, unknown> = { custom_data }
 
-  let resolvedSlug: string | undefined
-  if (typeof slug === 'string' && slug.trim().length > 0) {
-    resolvedSlug = await resolveUniqueSlug(supabase, slug.trim(), eventId)
-    update.slug = resolvedSlug
+  const desired = typeof slug === 'string' ? slugify(slug) : ''
+  let slugTaken = false
+
+  if (desired) {
+    if (await findSlugBlocker(desired, eventId, user.id)) {
+      slugTaken = true
+    } else {
+      // El nombre lo tenía un borrador sin pagar suyo: se libera y se reusa.
+      await releaseOwnDraftSlug(supabase, desired, eventId, user.id)
+      update.slug = desired
+    }
   }
 
-  let { error } = await supabase.from('events').update(update).eq('id', eventId)
-
-  // Carrera: alguien más tomó el slug resuelto entre el chequeo y el update.
-  // Un solo reintento con un sufijo corto al azar resuelve el caso extremo
-  // sin bloquear al usuario con el mensaje de error.
-  if (error?.code === '23505' && resolvedSlug) {
-    resolvedSlug = `${resolvedSlug}-${Math.random().toString(36).slice(2, 6)}`
-    update.slug = resolvedSlug
-    ;({ error } = await supabase.from('events').update(update).eq('id', eventId))
-  }
+  const { error } = await supabase.from('events').update(update).eq('id', eventId)
 
   if (error) {
+    // Carrera: alguien tomó el slug entre el chequeo y el update. Se reintenta
+    // sin tocar el slug para no perder lo que el cliente venía escribiendo.
     if (error.code === '23505') {
-      throw new Error('Ese link ya está en uso, prueba con otro.')
+      delete update.slug
+      const { error: retryError } = await supabase.from('events').update(update).eq('id', eventId)
+      if (retryError) throw new Error('No se pudo guardar el borrador.')
+      return { slugTaken: true }
     }
     throw new Error('No se pudo guardar el borrador.')
   }
 
-  return { slug: resolvedSlug }
+  return { slugTaken }
 }
 
 /**
@@ -77,7 +74,7 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
 
   const { data: event } = await supabase
     .from('events')
-    .select('id, owner_id, status, template_id')
+    .select('id, owner_id, status, template_id, slug')
     .eq('id', eventId)
     .single()
 
@@ -90,6 +87,13 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
   if (event.status !== 'draft') {
     // Ya se pagó (o está en otro estado) — no volver a cobrar.
     redirect(`/crear/${templateId}/preview`)
+  }
+
+  // El slug placeholder significa que el link deseado estaba ocupado y nunca
+  // llegó a guardarse. Cobrar aquí publicaría "borrador-a1b2c3d4.misello.com.mx"
+  // como link definitivo del cliente.
+  if (event.slug.startsWith('borrador-')) {
+    redirect(`/crear/${templateId}?paso=${reviewStepIndex}&error=link`)
   }
 
   const { data: template } = await supabase

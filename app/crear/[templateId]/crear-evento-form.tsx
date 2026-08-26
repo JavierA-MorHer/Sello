@@ -145,17 +145,20 @@ export function CrearEventoForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isPaying, startPayTransition] = useTransition()
   const payError = searchParams.get('error') === 'pago'
+  const linkError = searchParams.get('error') === 'link'
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [missingFieldAlert, setMissingFieldAlert] = useState<{ stepIndex: number; label: string } | null>(null)
   const [slugNotice, setSlugNotice] = useState<string | null>(null)
   const slugNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  const { register, control, watch, getValues, setValue } = useForm({ defaultValues })
+  const { register, control, watch, getValues } = useForm({ defaultValues })
 
-  function noteSlugAdjustment(resolvedSlug: string | undefined, requestedSlug: unknown) {
-    if (!resolvedSlug || resolvedSlug === requestedSlug) return
-    setValue('slug', resolvedSlug)
-    setSlugNotice(`Ese link ya estaba en uso — lo ajustamos a "${resolvedSlug}".`)
+  // El link no se cambia solo: si está ocupado se avisa y el cliente elige.
+  // Esto cubre el caso de estar en otro paso del wizard, donde no se ve el
+  // aviso que el propio campo del link ya muestra en línea.
+  function noteSlugTaken(slugTaken: boolean | undefined) {
+    if (!slugTaken) return
+    setSlugNotice('Ese link ya está ocupado — elige otro para poder publicar.')
     if (slugNoticeTimeoutRef.current) clearTimeout(slugNoticeTimeoutRef.current)
     slugNoticeTimeoutRef.current = setTimeout(() => setSlugNotice(null), 5000)
   }
@@ -167,7 +170,15 @@ export function CrearEventoForm({
       return
     }
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    await autosaveDraft(eventId, getValues()).catch(() => {})
+    const result = await autosaveDraft(eventId, getValues()).catch(() => undefined)
+
+    // El link que se ve en el formulario no se pudo guardar porque está
+    // ocupado: seguir al pago publicaría uno distinto al que el cliente eligió.
+    if (result?.slugTaken) {
+      noteSlugTaken(true)
+      return
+    }
+
     startPayTransition(() => createCheckoutSession(eventId, stepIndex))
   }
 
@@ -176,7 +187,7 @@ export function CrearEventoForm({
     setStatus('saving')
     try {
       const result = await autosaveDraft(eventId, getValues())
-      noteSlugAdjustment(result?.slug, getValues('slug'))
+      noteSlugTaken(result?.slugTaken)
       setStatus('saved')
     } catch (err) {
       setStatus('error')
@@ -193,7 +204,7 @@ export function CrearEventoForm({
         setStatus('saving')
         try {
           const result = await autosaveDraft(eventId, values as Record<string, unknown>)
-          noteSlugAdjustment(result?.slug, (values as Record<string, unknown>).slug)
+          noteSlugTaken(result?.slugTaken)
           setStatus('saved')
           setErrorMessage(null)
         } catch (err) {
@@ -302,6 +313,12 @@ export function CrearEventoForm({
             {payError && (
               <p className="font-body text-sm text-error">
                 No se pudo iniciar el pago. Intenta de nuevo en un momento.
+              </p>
+            )}
+
+            {linkError && (
+              <p className="font-body text-sm text-error">
+                Antes de pagar elige el link de tu invitación — el que querías ya está ocupado.
               </p>
             )}
           </>
