@@ -306,7 +306,7 @@ export function CrearEventoForm({
               </span>
               <span className="font-body text-sm leading-relaxed text-ink/70">
                 Tu invitación está lista, pero lleva marca de agua hasta que
-                completes el pago único de {priceRange}.
+                completes el pago único de {priceRange}, IVA incluido.
               </span>
             </div>
 

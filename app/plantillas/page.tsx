@@ -46,6 +46,9 @@ export default async function PlantillasPage() {
           Cada plantilla define sus propios campos. Puedes ver una vista
           previa completa antes de pagar.
         </p>
+        <p className="mt-2 font-body text-sm text-ink/50">
+          Precios en pesos mexicanos, pago único con IVA incluido.
+        </p>
 
         <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {(templates ?? []).map((template) => (

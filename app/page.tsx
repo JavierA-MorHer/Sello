@@ -252,7 +252,7 @@ export default async function LandingPage() {
                 <div>
                   <div className="font-display text-3xl">Desde {formatMXN(desdeBoda)}</div>
                   <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                    Boda · MXN, pago único
+                    Boda · MXN, pago único, IVA incluido
                   </div>
                 </div>
               )}
@@ -260,7 +260,7 @@ export default async function LandingPage() {
                 <div>
                   <div className="font-display text-3xl">Desde {formatMXN(desdeOtras)}</div>
                   <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                    XV años, bautizos y más
+                    XV años, bautizos y más · IVA incluido
                   </div>
                 </div>
               )}

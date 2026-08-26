@@ -124,7 +124,7 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
             unit_amount: priceMXN * 100,
             product_data: {
               name: `Invitación digital — ${template.name}`,
-              description: 'Pago único. Publica tu invitación y quita la marca de agua.',
+              description: 'Pago único, IVA incluido. Publica tu invitación y quita la marca de agua.',
             },
           },
           quantity: 1,
