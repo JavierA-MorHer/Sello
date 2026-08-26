@@ -5,6 +5,7 @@ import { EventCountdown } from './EventCountdown'
 import type { WeddingData } from './wedding.types'
 import { MapaUbicacion } from './MapaUbicacion'
 import { buildDirectionsUrl } from '@/lib/maps/urls'
+import { SELLO_BADGE_TEXT, SELLO_BADGE_URL } from '@/lib/marketing/sello-badge'
 
 const display = Italiana({ weight: '400', subsets: ['latin'], variable: '--font-tpl-display' })
 const script = Beau_Rivage({ weight: '400', subsets: ['latin'], variable: '--font-tpl-script' })
@@ -279,6 +280,15 @@ export function BodaClasica({
         <p style={bodyFont} className="mt-2 text-xs tracking-[0.2em] text-[#1c2333]/55 uppercase">
           {formatLargo(d.fecha_evento)}
         </p>
+        <a
+          href={SELLO_BADGE_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={bodyFont}
+          className="mt-6 inline-block text-[10px] tracking-[0.15em] text-[#1c2333]/35 uppercase no-underline hover:text-[#1c2333]/60"
+        >
+          {SELLO_BADGE_TEXT}
+        </a>
       </footer>
     </div>
   )

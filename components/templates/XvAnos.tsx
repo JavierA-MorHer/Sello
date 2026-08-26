@@ -7,6 +7,7 @@ import { XvAnosRsvp } from './XvAnosRsvp'
 import { TemplatePhoto } from './TemplatePhoto'
 import { MapaUbicacion } from './MapaUbicacion'
 import { buildDirectionsUrl } from '@/lib/maps/urls'
+import { SELLO_BADGE_TEXT, SELLO_BADGE_URL } from '@/lib/marketing/sello-badge'
 
 const display = Bodoni_Moda({ weight: ['400', '500'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-tpl-display' })
 const body = Jost({ weight: ['300', '400', '500'], subsets: ['latin'], variable: '--font-tpl-body' })
@@ -415,7 +416,9 @@ export function XvAnos({
           color: 'rgba(247,241,232,.28)',
         }}
       >
-        <span>Hecho con Sello</span>
+        <a href={SELLO_BADGE_URL} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+          {SELLO_BADGE_TEXT}
+        </a>
         <span style={{ width: 4, height: 4, borderRadius: 9999, background: tema.gold, marginLeft: 3 }} />
       </div>
     </div>

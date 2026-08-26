@@ -15,7 +15,7 @@ export function RsvpForm({
 }) {
   const [name, setName] = useState('')
   const [attending, setAttending] = useState<'si' | 'no' | null>(null)
-  const [plusOnes, setPlusOnes] = useState(0)
+  const [plusOnesInput, setPlusOnesInput] = useState('0')
   const [message, setMessage] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -41,6 +41,7 @@ export function RsvpForm({
     if (!eventId || attending === null) return
 
     setError(null)
+    const plusOnes = Math.max(0, parseInt(plusOnesInput, 10) || 0)
     startTransition(async () => {
       try {
         await submitRsvp(eventId, { name, attending: attending === 'si', plusOnes, message })
@@ -115,8 +116,9 @@ export function RsvpForm({
           <input
             type="number"
             min={0}
-            value={plusOnes}
-            onChange={(e) => setPlusOnes(Math.max(0, Number(e.target.value) || 0))}
+            value={plusOnesInput}
+            onChange={(e) => setPlusOnesInput(e.target.value)}
+            onBlur={() => setPlusOnesInput(String(Math.max(0, parseInt(plusOnesInput, 10) || 0)))}
             className="border-0 border-b border-[#f5efe4]/30 bg-transparent px-0.5 py-2 font-[family-name:var(--font-tpl-body)] text-base text-[#f5efe4] outline-none focus:border-[#f5efe4]"
           />
         </label>

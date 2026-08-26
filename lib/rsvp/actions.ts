@@ -1,8 +1,12 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendEmail } from '@/lib/email/resend'
+import { rsvpNotificationEmail } from '@/lib/email/templates'
+import { getEventTitle } from '@/lib/templates/summary'
 
 const PUBLISHED_STATUSES = ['active', 'expiring_soon']
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
 /**
  * Server Action pública (la llama cualquier invitado, sin sesión) — por eso
@@ -21,7 +25,11 @@ export async function submitRsvp(
 
   const supabase = createAdminClient()
 
-  const { data: event } = await supabase.from('events').select('status').eq('id', eventId).single()
+  const { data: event } = await supabase
+    .from('events')
+    .select('status, owner_id, template_id, custom_data')
+    .eq('id', eventId)
+    .single()
 
   if (!event || !PUBLISHED_STATUSES.includes(event.status)) {
     throw new Error('Esta invitación ya no acepta confirmaciones.')
@@ -47,5 +55,36 @@ export async function submitRsvp(
 
   if (rsvpError) {
     throw new Error('No se pudo guardar tu confirmación. Intenta de nuevo.')
+  }
+
+  // Notificación al dueño del evento — "best effort": el RSVP ya se guardó,
+  // así que un fallo aquí no debe hacer fallar la confirmación del invitado.
+  try {
+    const { data: template } = await supabase
+      .from('templates')
+      .select('category')
+      .eq('id', event.template_id)
+      .single()
+
+    const { data: owner } = await supabase.auth.admin.getUserById(event.owner_id)
+    const ownerEmail = owner?.user?.email
+
+    if (ownerEmail) {
+      const eventName = template
+        ? getEventTitle(template.category, (event.custom_data ?? {}) as Record<string, unknown>)
+        : 'tu evento'
+      const link = `${APP_URL}/mis-eventos/${eventId}/invitados`
+      const { subject, html } = rsvpNotificationEmail({
+        eventName,
+        guestName: name,
+        attending: data.attending,
+        plusOnes,
+        message,
+        link,
+      })
+      await sendEmail({ to: ownerEmail, subject, html })
+    }
+  } catch (err) {
+    console.error('[rsvp] No se pudo notificar al dueño del evento:', err)
   }
 }

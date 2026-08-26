@@ -5,6 +5,7 @@ import { EventCountdown } from './EventCountdown'
 import type { BautizoData } from './bautizo.types'
 import { MapaUbicacion } from './MapaUbicacion'
 import { buildDirectionsUrl } from '@/lib/maps/urls'
+import { SELLO_BADGE_TEXT, SELLO_BADGE_URL } from '@/lib/marketing/sello-badge'
 
 const display = Playfair_Display({ subsets: ['latin'], variable: '--font-tpl-display' })
 const body = Karla({ subsets: ['latin'], variable: '--font-tpl-body' })
@@ -294,6 +295,15 @@ export function Bautizo({
         <p style={bodyFont} className="mt-2 text-xs font-semibold tracking-[0.2em] text-[#213947]/55 uppercase">
           {formatLargo(d.fecha_evento)}
         </p>
+        <a
+          href={SELLO_BADGE_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={bodyFont}
+          className="mt-6 inline-block text-[10px] font-semibold tracking-[0.15em] text-[#213947]/35 uppercase no-underline hover:text-[#213947]/60"
+        >
+          {SELLO_BADGE_TEXT}
+        </a>
       </footer>
     </div>
   )

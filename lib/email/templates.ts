@@ -69,6 +69,46 @@ export function paymentConfirmationEmail({ eventName, link }: { eventName: strin
   }
 }
 
+export function rsvpNotificationEmail({
+  eventName,
+  guestName,
+  attending,
+  plusOnes,
+  message,
+  link,
+}: {
+  eventName: string
+  guestName: string
+  attending: boolean
+  plusOnes: number
+  message?: string | null
+  link: string
+}) {
+  const safeGuestName = escapeHtml(guestName)
+  const totalPersonas = plusOnes + 1
+  const asistenciaLinea = attending
+    ? `Asiste${totalPersonas > 1 ? ` · ${totalPersonas} personas` : ''}`
+    : 'No podrá asistir'
+  const safeMessage = message ? escapeHtml(message).replace(/\n/g, '<br />') : null
+
+  return {
+    subject: `${safeGuestName} confirmó para "${eventName}"`,
+    html: `
+      <div style="${WRAPPER_STYLE}">
+        <div style="${CARD_STYLE}">
+          <p style="font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #a8927e; font-weight: 600;">Sello</p>
+          <h1 style="font-size: 22px; margin: 8px 0 16px;">Nueva confirmación</h1>
+          <p style="font-size: 15px; line-height: 22px; color: #444748;">
+            <strong>${safeGuestName}</strong> respondió a "${eventName}": ${asistenciaLinea}.
+          </p>
+          ${safeMessage ? `<p style="font-size: 14px; line-height: 21px; color: #616565; font-style: italic;">"${safeMessage}"</p>` : ''}
+          <a href="${link}" style="${BUTTON_STYLE}">Ver todas las confirmaciones</a>
+        </div>
+      </div>
+    `,
+  }
+}
+
 export function expiryWarningEmail({
   eventName,
   link,

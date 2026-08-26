@@ -6,6 +6,7 @@ import type { BabyShowerData, BabyShowerTema } from './babyshower.types'
 import { BabyShowerRsvp } from './BabyShowerRsvp'
 import { MapaUbicacion } from './MapaUbicacion'
 import { buildDirectionsUrl } from '@/lib/maps/urls'
+import { SELLO_BADGE_TEXT, SELLO_BADGE_URL } from '@/lib/marketing/sello-badge'
 
 const display = Baloo_2({ weight: ['500', '600', '700', '800'], subsets: ['latin'], variable: '--font-tpl-display' })
 const body = Nunito({ weight: ['400', '600', '700'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-tpl-body' })
@@ -491,7 +492,9 @@ export function BabyShower({
               color: 'rgba(46,42,38,.4)',
             }}
           >
-            <span>Hecho con Sello</span>
+            <a href={SELLO_BADGE_URL} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+              {SELLO_BADGE_TEXT}
+            </a>
             <span style={{ width: 5, height: 5, borderRadius: 9999, background: tema.accent, marginLeft: 3 }} />
           </div>
         </div>
