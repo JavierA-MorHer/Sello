@@ -35,14 +35,7 @@ values (
         "description": "Dónde y a qué hora empieza la ceremonia.",
         "fields": [
           { "key": "hora_ceremonia", "label": "Hora de la ceremonia", "type": "time" },
-          { "key": "ceremonia_lugar", "label": "Nombre del lugar", "type": "text", "required": true },
-          { "key": "ceremonia_direccion", "label": "Dirección", "type": "text", "required": true },
-          {
-            "key": "ceremonia_mapa",
-            "label": "Ubicación en el mapa",
-            "type": "map",
-            "sourceFields": ["ceremonia_lugar", "ceremonia_direccion"]
-          }
+          { "key": "ceremonia_ubicacion", "label": "Lugar de la ceremonia", "type": "ubicacion", "required": true }
         ]
       },
       {
@@ -50,14 +43,7 @@ values (
         "title": "Recepción",
         "description": "Dónde sigue la fiesta después de la ceremonia.",
         "fields": [
-          { "key": "recepcion_lugar", "label": "Nombre del lugar", "type": "text", "required": true },
-          { "key": "recepcion_direccion", "label": "Dirección", "type": "text", "required": true },
-          {
-            "key": "recepcion_mapa",
-            "label": "Ubicación en el mapa",
-            "type": "map",
-            "sourceFields": ["recepcion_lugar", "recepcion_direccion"]
-          }
+          { "key": "recepcion_ubicacion", "label": "Lugar de la recepción", "type": "ubicacion", "required": true }
         ]
       },
       {

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { Baloo_2, Nunito } from 'next/font/google'
 import type { BabyShowerData, BabyShowerTema } from './babyshower.types'
 import { BabyShowerRsvp } from './BabyShowerRsvp'
-import { buildMapsSearchUrl } from '@/lib/text/maps'
+import { MapaUbicacion } from './MapaUbicacion'
+import { buildDirectionsUrl } from '@/lib/maps/urls'
 
 const display = Baloo_2({ weight: ['500', '600', '700', '800'], subsets: ['latin'], variable: '--font-tpl-display' })
 const body = Nunito({ weight: ['400', '600', '700'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-tpl-body' })
@@ -89,7 +90,7 @@ export function BabyShower({
   const d = custom_data
   const tema = TEMAS[d.tema ?? 'neutro']
   const countdown = useCountdown(d.fecha_evento, d.hora_evento)
-  const mapaUrl = buildMapsSearchUrl(d.lugar_nombre, d.lugar_direccion)
+  const mapaUrl = d.lugar_ubicacion ? buildDirectionsUrl(d.lugar_ubicacion) : null
 
   return (
     <div className={`${display.variable} ${body.variable}`} style={{ ...bodyFont, background: PAPER, color: INK }}>
@@ -278,21 +279,27 @@ export function BabyShower({
       <section style={{ padding: '0 26px 42px' }}>
         <SectionHeader title="Dónde nos vemos" accent={tema.accent} />
         <div style={{ background: PAPER, border: `2px solid ${INK}`, borderRadius: 22, overflow: 'hidden', boxShadow: `5px 5px 0 ${INK}` }}>
-          <div
-            style={{
-              height: 170,
-              background: 'repeating-linear-gradient(135deg, #f3efe4 0 9px, #e9e3d5 9px 18px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderBottom: `2px solid ${INK}`,
-            }}
-          >
-            <span style={{ ...bodyFont, fontWeight: 700, fontSize: 10, letterSpacing: '.1em', color: INK_FAINT }}>MAPA DEL LUGAR</span>
-          </div>
+          <MapaUbicacion
+            ubicacion={d.lugar_ubicacion}
+            className="h-[170px] w-full border-b-2 border-[#2e2a26]"
+          />
+          {!d.lugar_ubicacion?.lat && (
+            <div
+              style={{
+                height: 170,
+                background: 'repeating-linear-gradient(135deg, #f3efe4 0 9px, #e9e3d5 9px 18px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderBottom: `2px solid ${INK}`,
+              }}
+            >
+              <span style={{ ...bodyFont, fontWeight: 700, fontSize: 10, letterSpacing: '.1em', color: INK_FAINT }}>MAPA DEL LUGAR</span>
+            </div>
+          )}
           <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ ...displayFont, fontWeight: 700, fontSize: 20, lineHeight: '26px' }}>{d.lugar_nombre}</div>
-            <div style={{ fontSize: 14, color: INK_SOFT, marginTop: 2 }}>{d.lugar_direccion}</div>
+            <div style={{ ...displayFont, fontWeight: 700, fontSize: 20, lineHeight: '26px' }}>{d.lugar_ubicacion?.lugar}</div>
+            <div style={{ fontSize: 14, color: INK_SOFT, marginTop: 2 }}>{d.lugar_ubicacion?.direccion}</div>
             {mapaUrl && (
               <a
                 href={mapaUrl}

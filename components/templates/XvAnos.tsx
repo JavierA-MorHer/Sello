@@ -5,7 +5,8 @@ import { Bodoni_Moda, Jost } from 'next/font/google'
 import type { XvAnosData, XvAnosTema } from './xvanos.types'
 import { XvAnosRsvp } from './XvAnosRsvp'
 import { TemplatePhoto } from './TemplatePhoto'
-import { buildMapsSearchUrl } from '@/lib/text/maps'
+import { MapaUbicacion } from './MapaUbicacion'
+import { buildDirectionsUrl } from '@/lib/maps/urls'
 
 const display = Bodoni_Moda({ weight: ['400', '500'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-tpl-display' })
 const body = Jost({ weight: ['300', '400', '500'], subsets: ['latin'], variable: '--font-tpl-body' })
@@ -97,8 +98,8 @@ export function XvAnos({
   const pases = d.pases_por_invitacion && d.pases_por_invitacion > 0 ? d.pases_por_invitacion : 4
   const retrato = fotos[0]
   const galeria = fotos.slice(1)
-  const iglesiaMapaUrl = buildMapsSearchUrl(d.iglesia_nombre, d.iglesia_direccion)
-  const recepcionMapaUrl = buildMapsSearchUrl(d.recepcion_nombre, d.recepcion_direccion)
+  const iglesiaMapaUrl = d.iglesia_ubicacion ? buildDirectionsUrl(d.iglesia_ubicacion) : null
+  const recepcionMapaUrl = d.recepcion_ubicacion ? buildDirectionsUrl(d.recepcion_ubicacion) : null
 
   return (
     <div className={`${display.variable} ${body.variable}`} style={{ ...bodyFont, fontWeight: 300, background: tema.dark, color: IVORY }}>
@@ -232,11 +233,15 @@ export function XvAnos({
       <section style={{ padding: '0 30px 52px', display: 'flex', flexDirection: 'column', gap: 2 }}>
         <div style={{ border: `1px solid ${BORDER}`, padding: '28px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.26em', textTransform: 'uppercase', color: tema.gold }}>Misa de acción de gracias</span>
-          <span style={{ ...displayFont, fontSize: 24, lineHeight: '31px', marginTop: 2 }}>{d.iglesia_nombre}</span>
-          <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '20px', color: 'rgba(247,241,232,.6)' }}>{d.iglesia_direccion}</span>
+          <span style={{ ...displayFont, fontSize: 24, lineHeight: '31px', marginTop: 2 }}>{d.iglesia_ubicacion?.lugar}</span>
+          <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '20px', color: 'rgba(247,241,232,.6)' }}>{d.iglesia_ubicacion?.direccion}</span>
           {d.iglesia_hora && (
             <span style={{ ...displayFont, fontStyle: 'italic', fontSize: 17, color: tema.gold, marginTop: 4 }}>{d.iglesia_hora}</span>
           )}
+          <MapaUbicacion
+            ubicacion={d.iglesia_ubicacion}
+            className="mt-3 h-36 w-full overflow-hidden rounded"
+          />
           {iglesiaMapaUrl && (
             <a
               href={iglesiaMapaUrl}
@@ -255,17 +260,21 @@ export function XvAnos({
                 textDecoration: 'none',
               }}
             >
-              Ver mapa
+              Cómo llegar
             </a>
           )}
         </div>
         <div style={{ border: `1px solid ${BORDER}`, padding: '28px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span style={{ ...bodyFont, fontSize: 9, letterSpacing: '.26em', textTransform: 'uppercase', color: tema.gold }}>Recepción</span>
-          <span style={{ ...displayFont, fontSize: 24, lineHeight: '31px', marginTop: 2 }}>{d.recepcion_nombre}</span>
-          <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '20px', color: 'rgba(247,241,232,.6)' }}>{d.recepcion_direccion}</span>
+          <span style={{ ...displayFont, fontSize: 24, lineHeight: '31px', marginTop: 2 }}>{d.recepcion_ubicacion?.lugar}</span>
+          <span style={{ ...bodyFont, fontWeight: 300, fontSize: 13, lineHeight: '20px', color: 'rgba(247,241,232,.6)' }}>{d.recepcion_ubicacion?.direccion}</span>
           {d.recepcion_hora && (
             <span style={{ ...displayFont, fontStyle: 'italic', fontSize: 17, color: tema.gold, marginTop: 4 }}>{d.recepcion_hora}</span>
           )}
+          <MapaUbicacion
+            ubicacion={d.recepcion_ubicacion}
+            className="mt-3 h-36 w-full overflow-hidden rounded"
+          />
           {recepcionMapaUrl && (
             <a
               href={recepcionMapaUrl}
@@ -284,7 +293,7 @@ export function XvAnos({
                 textDecoration: 'none',
               }}
             >
-              Ver mapa
+              Cómo llegar
             </a>
           )}
         </div>

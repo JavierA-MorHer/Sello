@@ -35,14 +35,7 @@ values (
         "description": "Dónde y a qué hora empieza la misa de bautizo.",
         "fields": [
           { "key": "hora_misa", "label": "Hora de la misa", "type": "time" },
-          { "key": "iglesia_lugar", "label": "Nombre del lugar", "type": "text", "required": true },
-          { "key": "iglesia_direccion", "label": "Dirección", "type": "text", "required": true },
-          {
-            "key": "iglesia_mapa",
-            "label": "Ubicación en el mapa",
-            "type": "map",
-            "sourceFields": ["iglesia_lugar", "iglesia_direccion"]
-          }
+          { "key": "iglesia_ubicacion", "label": "Lugar de la misa", "type": "ubicacion", "required": true }
         ]
       },
       {
@@ -50,14 +43,7 @@ values (
         "title": "Recepción",
         "description": "Opcional — si hay festejo después de la misa.",
         "fields": [
-          { "key": "recepcion_lugar", "label": "Nombre del lugar", "type": "text" },
-          { "key": "recepcion_direccion", "label": "Dirección", "type": "text" },
-          {
-            "key": "recepcion_mapa",
-            "label": "Ubicación en el mapa",
-            "type": "map",
-            "sourceFields": ["recepcion_lugar", "recepcion_direccion"]
-          }
+          { "key": "recepcion_ubicacion", "label": "Lugar de la recepción", "type": "ubicacion" }
         ]
       },
       {

@@ -3,7 +3,8 @@ import { TemplatePhoto } from './TemplatePhoto'
 import { RsvpForm } from './RsvpForm'
 import { EventCountdown } from './EventCountdown'
 import type { WeddingData } from './wedding.types'
-import { buildMapsSearchUrl } from '@/lib/text/maps'
+import { MapaUbicacion } from './MapaUbicacion'
+import { buildDirectionsUrl } from '@/lib/maps/urls'
 
 const display = Italiana({ weight: '400', subsets: ['latin'], variable: '--font-tpl-display' })
 const script = Beau_Rivage({ weight: '400', subsets: ['latin'], variable: '--font-tpl-script' })
@@ -50,8 +51,8 @@ export function BodaClasica({
   const portada = fotos[0] ?? '/demo/boda-placeholder.jpg'
   // La primera foto ya se usa como portada del hero — la galería muestra el resto.
   const galeria = fotos.slice(1)
-  const ceremoniaMapaUrl = buildMapsSearchUrl(d.ceremonia_lugar, d.ceremonia_direccion)
-  const recepcionMapaUrl = buildMapsSearchUrl(d.recepcion_lugar, d.recepcion_direccion)
+  const ceremoniaMapaUrl = d.ceremonia_ubicacion ? buildDirectionsUrl(d.ceremonia_ubicacion) : null
+  const recepcionMapaUrl = d.recepcion_ubicacion ? buildDirectionsUrl(d.recepcion_ubicacion) : null
 
   return (
     <div
@@ -113,11 +114,15 @@ export function BodaClasica({
               Ceremonia{d.hora_ceremonia ? ` · ${d.hora_ceremonia}` : ''}
             </p>
             <p style={displayFont} className="mt-3 text-2xl">
-              {d.ceremonia_lugar}
+              {d.ceremonia_ubicacion?.lugar}
             </p>
             <p style={bodyFont} className="mt-2 text-sm text-[#1c2333]/85">
-              {d.ceremonia_direccion}
+              {d.ceremonia_ubicacion?.direccion}
             </p>
+            <MapaUbicacion
+              ubicacion={d.ceremonia_ubicacion}
+              className="mx-auto mt-4 h-40 max-w-sm overflow-hidden rounded-sm border border-[#1c2333]/10"
+            />
             {ceremoniaMapaUrl && (
               <a
                 href={ceremoniaMapaUrl}
@@ -126,7 +131,7 @@ export function BodaClasica({
                 style={bodyFont}
                 className="mt-3 inline-block text-xs tracking-[0.15em] text-[#1c2333] underline decoration-[#1c2333]/30 underline-offset-4 uppercase"
               >
-                Ver mapa
+                Cómo llegar
               </a>
             )}
           </div>
@@ -136,11 +141,15 @@ export function BodaClasica({
               Recepción
             </p>
             <p style={displayFont} className="mt-3 text-2xl">
-              {d.recepcion_lugar}
+              {d.recepcion_ubicacion?.lugar}
             </p>
             <p style={bodyFont} className="mt-2 text-sm text-[#1c2333]/85">
-              {d.recepcion_direccion}
+              {d.recepcion_ubicacion?.direccion}
             </p>
+            <MapaUbicacion
+              ubicacion={d.recepcion_ubicacion}
+              className="mx-auto mt-4 h-40 max-w-sm overflow-hidden rounded-sm border border-[#1c2333]/10"
+            />
             {recepcionMapaUrl && (
               <a
                 href={recepcionMapaUrl}
@@ -149,7 +158,7 @@ export function BodaClasica({
                 style={bodyFont}
                 className="mt-3 inline-block text-xs tracking-[0.15em] text-[#1c2333] underline decoration-[#1c2333]/30 underline-offset-4 uppercase"
               >
-                Ver mapa
+                Cómo llegar
               </a>
             )}
           </div>

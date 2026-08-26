@@ -10,7 +10,7 @@ export type FieldType =
   | 'repeater'
   | 'gallery'
   | 'slug'
-  | 'map'
+  | 'ubicacion'
 
 interface BaseField {
   key: string
@@ -70,10 +70,18 @@ export interface SlugField extends BaseField {
   sourceFields?: string[]
 }
 
-export interface MapField extends BaseField {
-  type: 'map'
-  /** Claves de otros campos (ej. lugar + dirección) que arman la búsqueda en Google Maps. */
-  sourceFields: string[]
+/** Valor que guarda un campo `ubicacion` en `custom_data`. */
+export interface UbicacionValue {
+  lugar: string
+  direccion: string
+  lat: number
+  lng: number
+  place_id: string
+}
+
+export interface UbicacionField extends BaseField {
+  type: 'ubicacion'
+  placeholder?: string
 }
 
 export type Field =
@@ -85,7 +93,7 @@ export type Field =
   | RepeaterField
   | GalleryField
   | SlugField
-  | MapField
+  | UbicacionField
 
 export interface FieldSchemaSection {
   id: string

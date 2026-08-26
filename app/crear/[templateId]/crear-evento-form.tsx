@@ -33,6 +33,10 @@ function formatFieldValue(field: Field, raw: unknown): string {
   if (field.type === 'date') return formatDateEs(raw) || 'Sin llenar'
   if (raw === undefined || raw === null || raw === '' || (typeof raw === 'number' && Number.isNaN(raw))) return 'Sin llenar'
   if (field.type === 'select') return field.options.find((opt) => opt.value === raw)?.label ?? String(raw)
+  if (field.type === 'ubicacion') {
+    const ubicacion = raw as { lugar?: string; direccion?: string }
+    return ubicacion.lugar || ubicacion.direccion || 'Sin llenar'
+  }
   return String(raw)
 }
 
@@ -45,8 +49,7 @@ function summarizeSchema(
       section: section.title,
       rows: section.fields
         .filter(
-          (field): field is Exclude<Field, { type: 'group' | 'map' }> =>
-            field.type !== 'group' && field.type !== 'map'
+          (field): field is Exclude<Field, { type: 'group' }> => field.type !== 'group'
         )
         .map((field) => ({ k: field.label, v: formatFieldValue(field, values[field.key]) })),
     }))
@@ -92,7 +95,7 @@ function findFirstMissingRequiredStep(
 ): { stepIndex: number; label: string } | null {
   for (let i = 0; i < schema.sections.length; i++) {
     const missing = schema.sections[i].fields.find(
-      (field) => field.type !== 'group' && field.type !== 'map' && field.required && isFieldEmpty(field, values[field.key])
+      (field) => field.type !== 'group' && field.required && isFieldEmpty(field, values[field.key])
     )
     if (missing) return { stepIndex: i, label: missing.label }
   }

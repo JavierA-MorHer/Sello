@@ -3,7 +3,7 @@ import type { Field } from '@/lib/templates/types'
 import { RepeaterField } from './repeater-field'
 import { GalleryField } from './gallery-field'
 import { SlugField } from './slug-field'
-import { MapField } from './map-field'
+import { UbicacionField } from './ubicacion-field'
 
 const labelClass =
   'font-body text-xs font-semibold tracking-[0.05em] text-ink/60 uppercase'
@@ -167,11 +167,14 @@ export function FieldRenderer({
         </label>
       )
 
-    case 'map':
+    case 'ubicacion':
       return (
         <div className="flex flex-col gap-1.5">
-          <span className={labelClass}>{labelText}</span>
-          <MapField field={field} name={name} control={control} />
+          <span className={labelClass}>
+            {labelText}
+            {field.required && <span className="text-clay"> *</span>}
+          </span>
+          <UbicacionField field={field} name={name} control={control} />
         </div>
       )
   }

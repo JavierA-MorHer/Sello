@@ -1,3 +1,5 @@
+import type { UbicacionValue } from '@/lib/templates/types'
+
 export interface WeddingEvento {
   hora: string
   titulo: string
@@ -15,10 +17,8 @@ export interface WeddingData {
   frase_bienvenida?: string
   fecha_evento: string
   hora_ceremonia?: string
-  ceremonia_lugar: string
-  ceremonia_direccion: string
-  recepcion_lugar: string
-  recepcion_direccion: string
+  ceremonia_ubicacion: UbicacionValue
+  recepcion_ubicacion: UbicacionValue
   eventos?: WeddingEvento[]
   opciones?: WeddingRegalo[]
   fecha_limite_rsvp?: string

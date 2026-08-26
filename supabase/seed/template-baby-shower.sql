@@ -62,14 +62,7 @@ values (
         "title": "Lugar",
         "description": "Dónde es el festejo.",
         "fields": [
-          { "key": "lugar_nombre", "label": "Nombre del lugar", "type": "text", "required": true },
-          { "key": "lugar_direccion", "label": "Dirección", "type": "text", "required": true },
-          {
-            "key": "lugar_mapa",
-            "label": "Ubicación en el mapa",
-            "type": "map",
-            "sourceFields": ["lugar_nombre", "lugar_direccion"]
-          }
+          { "key": "lugar_ubicacion", "label": "Lugar del festejo", "type": "ubicacion", "required": true }
         ]
       },
       {

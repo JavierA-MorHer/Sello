@@ -56,14 +56,7 @@
       "description": "Dónde y a qué hora empieza la misa.",
       "fields": [
         { "key": "iglesia_hora", "label": "Hora de la misa", "type": "time" },
-        { "key": "iglesia_nombre", "label": "Nombre del lugar", "type": "text", "required": true },
-        { "key": "iglesia_direccion", "label": "Dirección", "type": "text", "required": true },
-        {
-          "key": "iglesia_mapa",
-          "label": "Ubicación en el mapa",
-          "type": "map",
-          "sourceFields": ["iglesia_nombre", "iglesia_direccion"]
-        }
+        { "key": "iglesia_ubicacion", "label": "Lugar de la misa", "type": "ubicacion", "required": true }
       ]
     },
     {
@@ -72,14 +65,7 @@
       "description": "Dónde sigue la fiesta después de la misa.",
       "fields": [
         { "key": "recepcion_hora", "label": "Hora", "type": "time" },
-        { "key": "recepcion_nombre", "label": "Nombre del lugar", "type": "text", "required": true },
-        { "key": "recepcion_direccion", "label": "Dirección", "type": "text", "required": true },
-        {
-          "key": "recepcion_mapa",
-          "label": "Ubicación en el mapa",
-          "type": "map",
-          "sourceFields": ["recepcion_nombre", "recepcion_direccion"]
-        }
+        { "key": "recepcion_ubicacion", "label": "Lugar de la recepción", "type": "ubicacion", "required": true }
       ]
     },
     {

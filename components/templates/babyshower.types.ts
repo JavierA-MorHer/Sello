@@ -1,3 +1,5 @@
+import type { UbicacionValue } from '@/lib/templates/types'
+
 export type BabyShowerTema = 'neutro' | 'nino' | 'nina'
 
 export interface BabyShowerPlanItem {
@@ -24,8 +26,7 @@ export interface BabyShowerData {
   dedicatoria?: string
   fecha_evento: string
   hora_evento?: string
-  lugar_nombre: string
-  lugar_direccion: string
+  lugar_ubicacion: UbicacionValue
   plan?: BabyShowerPlanItem[]
   juegos?: BabyShowerJuego[]
   tiendas?: BabyShowerTienda[]

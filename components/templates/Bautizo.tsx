@@ -3,7 +3,8 @@ import { TemplatePhoto } from './TemplatePhoto'
 import { RsvpForm } from './RsvpForm'
 import { EventCountdown } from './EventCountdown'
 import type { BautizoData } from './bautizo.types'
-import { buildMapsSearchUrl } from '@/lib/text/maps'
+import { MapaUbicacion } from './MapaUbicacion'
+import { buildDirectionsUrl } from '@/lib/maps/urls'
 
 const display = Playfair_Display({ subsets: ['latin'], variable: '--font-tpl-display' })
 const body = Karla({ subsets: ['latin'], variable: '--font-tpl-body' })
@@ -40,8 +41,8 @@ export function Bautizo({
   const d = custom_data
   const portada = fotos[0] ?? '/demo/boda-placeholder.jpg'
   const galeria = fotos.slice(1)
-  const iglesiaMapaUrl = buildMapsSearchUrl(d.iglesia_lugar, d.iglesia_direccion)
-  const recepcionMapaUrl = buildMapsSearchUrl(d.recepcion_lugar, d.recepcion_direccion)
+  const iglesiaMapaUrl = d.iglesia_ubicacion ? buildDirectionsUrl(d.iglesia_ubicacion) : null
+  const recepcionMapaUrl = d.recepcion_ubicacion ? buildDirectionsUrl(d.recepcion_ubicacion) : null
 
   return (
     <div
@@ -99,11 +100,15 @@ export function Bautizo({
               Misa{d.hora_misa ? ` · ${d.hora_misa}` : ''}
             </p>
             <p style={displayFont} className="mt-3 text-2xl">
-              {d.iglesia_lugar}
+              {d.iglesia_ubicacion?.lugar}
             </p>
             <p style={bodyFont} className="mt-2 text-sm text-[#213947]/85">
-              {d.iglesia_direccion}
+              {d.iglesia_ubicacion?.direccion}
             </p>
+            <MapaUbicacion
+              ubicacion={d.iglesia_ubicacion}
+              className="mx-auto mt-4 h-40 max-w-sm overflow-hidden rounded-sm border border-[#213947]/10"
+            />
             {iglesiaMapaUrl && (
               <a
                 href={iglesiaMapaUrl}
@@ -112,22 +117,26 @@ export function Bautizo({
                 style={bodyFont}
                 className="mt-3 inline-block text-xs font-semibold tracking-[0.15em] text-[#213947] underline decoration-[#213947]/30 underline-offset-4 uppercase"
               >
-                Ver mapa
+                Cómo llegar
               </a>
             )}
           </div>
 
-          {d.recepcion_lugar && (
+          {d.recepcion_ubicacion && (
             <div className="text-center">
               <p style={bodyFont} className="text-xs font-semibold tracking-[0.2em] text-[#213947]/60 uppercase">
                 Recepción
               </p>
               <p style={displayFont} className="mt-3 text-2xl">
-                {d.recepcion_lugar}
+                {d.recepcion_ubicacion.lugar}
               </p>
               <p style={bodyFont} className="mt-2 text-sm text-[#213947]/85">
-                {d.recepcion_direccion}
+                {d.recepcion_ubicacion.direccion}
               </p>
+              <MapaUbicacion
+                ubicacion={d.recepcion_ubicacion}
+                className="mx-auto mt-4 h-40 max-w-sm overflow-hidden rounded-sm border border-[#213947]/10"
+              />
               {recepcionMapaUrl && (
                 <a
                   href={recepcionMapaUrl}
@@ -136,7 +145,7 @@ export function Bautizo({
                   style={bodyFont}
                   className="mt-3 inline-block text-xs font-semibold tracking-[0.15em] text-[#213947] underline decoration-[#213947]/30 underline-offset-4 uppercase"
                 >
-                  Ver mapa
+                  Cómo llegar
                 </a>
               )}
             </div>

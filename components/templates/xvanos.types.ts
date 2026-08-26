@@ -1,3 +1,5 @@
+import type { UbicacionValue } from '@/lib/templates/types'
+
 export type XvAnosTema = 'noche' | 'esmeralda' | 'vino'
 
 export interface XvAnosProgramaItem {
@@ -17,11 +19,9 @@ export interface XvAnosData {
   padres: string
   padrinos?: string
   dedicatoria?: string
-  iglesia_nombre: string
-  iglesia_direccion: string
+  iglesia_ubicacion: UbicacionValue
   iglesia_hora?: string
-  recepcion_nombre: string
-  recepcion_direccion: string
+  recepcion_ubicacion: UbicacionValue
   recepcion_hora?: string
   programa?: XvAnosProgramaItem[]
   vestimenta?: string

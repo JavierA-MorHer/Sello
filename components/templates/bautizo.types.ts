@@ -1,3 +1,5 @@
+import type { UbicacionValue } from '@/lib/templates/types'
+
 export interface BautizoEvento {
   hora: string
   titulo: string
@@ -20,10 +22,8 @@ export interface BautizoData {
   frase_bienvenida?: string
   fecha_evento: string
   hora_misa?: string
-  iglesia_lugar: string
-  iglesia_direccion: string
-  recepcion_lugar?: string
-  recepcion_direccion?: string
+  iglesia_ubicacion: UbicacionValue
+  recepcion_ubicacion?: UbicacionValue
   eventos?: BautizoEvento[]
   padrinos?: BautizoPadrino[]
   opciones?: BautizoRegalo[]
