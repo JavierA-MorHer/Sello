@@ -1,8 +1,16 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { formatMXN } from '@/lib/templates/pricing'
 import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { AppMenu } from '@/components/nav/AppMenu'
+
+// Página detrás de login: no aporta nada en el índice de Google y solo
+// gasta presupuesto de rastreo. Refuerza el Disallow de app/robots.ts.
+export const metadata: Metadata = {
+  title: 'Elige tu plantilla',
+  robots: { index: false, follow: false },
+}
 
 const COMING_SOON = ['Genérico']
 

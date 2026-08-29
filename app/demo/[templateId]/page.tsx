@@ -1,8 +1,64 @@
+import type { Metadata } from 'next'
+import { cache } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { TEMPLATE_COMPONENTS } from '@/lib/templates/registry'
 import { DEMO_DATA } from '@/lib/templates/demoData'
+import { TrackEvent } from '@/components/analytics/TrackEvent'
+
+// Cómo se nombra cada categoría en el texto de cara a buscadores. Es la
+// palabra que la gente escribe en Google ("invitaciones digitales para
+// bautizo"), no la etiqueta interna de la base de datos.
+const CATEGORIA_EN_TEXTO: Record<string, string> = {
+  boda: 'boda',
+  xv_anos: 'XV años',
+  bautizo: 'bautizo',
+  baby_shower: 'baby shower',
+  generico: 'evento',
+}
+
+// cache() dedupea la consulta entre generateMetadata y el render — ambos
+// corren para el mismo request (mismo patrón que app/evento/[slug]/page.tsx).
+const getTemplate = cache(async (templateId: string) => {
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('templates')
+    .select('id, name, category, component_key')
+    .eq('id', templateId)
+    .eq('active', true)
+    .single()
+
+  return data
+})
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ templateId: string }>
+}): Promise<Metadata> {
+  const { templateId } = await params
+  const template = await getTemplate(templateId)
+
+  if (!template) return { title: 'Plantilla no encontrada' }
+
+  const categoria = CATEGORIA_EN_TEXTO[template.category] ?? 'evento'
+  // La keyword va primero (es lo que Google trunca menos) y "plantilla"
+  // evita que se lea repetido cuando el nombre ya trae la categoría dentro,
+  // como en "XV Años".
+  const title = `Invitación digital para ${categoria} — plantilla ${template.name}`
+  const description = `Así se ve la plantilla ${template.name}: invitación digital de ${categoria} con confirmación de asistencia, ubicación y enlace para compartir por WhatsApp. Pago único, sin suscripción.`
+
+  return {
+    title,
+    description,
+    // Todas las variantes (incluida ?bare=1, que usan los thumbnails) apuntan
+    // a la misma URL limpia para no partir la señal entre duplicados.
+    alternates: { canonical: `/demo/${templateId}` },
+    openGraph: { title, description, url: `/demo/${templateId}`, type: 'article' },
+  }
+}
 
 /**
  * Demo público de una plantilla, sin necesidad de cuenta: usa datos de
@@ -20,14 +76,7 @@ export default async function DemoPage({
 }) {
   const { templateId } = await params
   const { bare } = await searchParams
-  const supabase = await createClient()
-
-  const { data: template } = await supabase
-    .from('templates')
-    .select('id, name, component_key')
-    .eq('id', templateId)
-    .eq('active', true)
-    .single()
+  const template = await getTemplate(templateId)
 
   if (!template) {
     notFound()
@@ -44,6 +93,7 @@ export default async function DemoPage({
   // ver PhoneFramePreview) — es el modo que usa el iframe del thumbnail en
   // TemplateCard. overflow hidden evita el scrollbar del iframe: se ve como
   // una foto fija del primer tramo de la invitación, no una página con scroll.
+  // Sin TrackEvent: es un thumbnail, no una visita real a la plantilla.
   if (bare === '1') {
     return (
       <div style={{ height: 844, overflow: 'hidden' }}>
@@ -54,6 +104,16 @@ export default async function DemoPage({
 
   return (
     <div className="min-h-screen bg-paper">
+      <TrackEvent
+        event="ViewContent"
+        params={{
+          content_name: template.name,
+          content_ids: [template.id],
+          content_type: 'product',
+          content_category: template.category,
+        }}
+      />
+
       <div className="sticky top-0 z-30 flex items-center justify-between bg-ink px-4 py-3.5 sm:px-6">
         <Link
           href="/plantillas"

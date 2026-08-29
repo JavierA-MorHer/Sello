@@ -48,6 +48,11 @@ export async function proxy(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = `/evento/${slug}${url.pathname}`
     const rewritten = NextResponse.rewrite(url)
+    // Refuerza el `noindex` que ya emite app/evento/[slug]/page.tsx: los
+    // subdominios son invitaciones privadas de clientes y no deben terminar
+    // en un buscador. El header lo respetan también los crawlers que no
+    // ejecutan JS ni leen el <head>.
+    rewritten.headers.set('X-Robots-Tag', 'noindex, nofollow')
     response.cookies.getAll().forEach((cookie) => rewritten.cookies.set(cookie))
     return rewritten
   }

@@ -1,7 +1,15 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getEventTitle } from '@/lib/templates/summary'
 import { AppMenu } from '@/components/nav/AppMenu'
+
+// Página detrás de login: no aporta nada en el índice de Google y solo
+// gasta presupuesto de rastreo. Refuerza el Disallow de app/robots.ts.
+export const metadata: Metadata = {
+  title: 'Admin',
+  robots: { index: false, follow: false },
+}
 
 const STATUS_ORDER = ['draft', 'active', 'expiring_soon', 'expired', 'archived'] as const
 
