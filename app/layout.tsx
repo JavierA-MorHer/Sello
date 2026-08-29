@@ -16,7 +16,10 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+// Fallback al dominio real, no a localhost: metadataBase alimenta el canonical
+// y las URLs de Open Graph. Si en producción faltara la env var, un fallback a
+// localhost le diría a Google que la página buena vive en localhost.
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://misello.com.mx";
 const TITLE = "Invitaciones digitales para boda, XV años y bautizo | Sello";
 const DESCRIPTION =
   "Crea tu invitación digital en minutos: contestas unas preguntas y queda lista para compartir por WhatsApp, con confirmación de asistencia (RSVP). Pago único, sin suscripción.";
