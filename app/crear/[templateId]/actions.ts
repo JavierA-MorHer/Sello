@@ -1,10 +1,12 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { after } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/server'
 import { slugify } from '@/lib/text/slugify'
 import { findSlugBlocker, releaseOwnDraftSlug } from '@/lib/events/slug'
+import { collectMetaUserData, trackMetaEvent } from '@/lib/analytics/meta'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -110,6 +112,12 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
     redirect(`/crear/${templateId}?paso=${reviewStepIndex}&error=pago`)
   }
 
+  // Cookies del pixel + IP/user-agent del navegador que SÍ está presente
+  // ahora. El webhook de Stripe corre después, sin request del usuario, así
+  // que estas señales tienen que viajar con la sesión para poder atribuir el
+  // Purchase al anuncio que lo originó.
+  const metaUser = await collectMetaUserData(user.email)
+
   let checkoutUrl: string
   try {
     const stripe = getStripe()
@@ -130,7 +138,14 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
           quantity: 1,
         },
       ],
-      metadata: { event_id: eventId },
+      metadata: {
+        event_id: eventId,
+        // Stripe limita cada valor de metadata a 500 caracteres.
+        ...(metaUser.fbp ? { fb_fbp: metaUser.fbp } : {}),
+        ...(metaUser.fbc ? { fb_fbc: metaUser.fbc } : {}),
+        ...(metaUser.ip ? { fb_ip: metaUser.ip } : {}),
+        ...(metaUser.userAgent ? { fb_user_agent: metaUser.userAgent.slice(0, 480) } : {}),
+      },
       customer_email: user.email ?? undefined,
       success_url: `${APP_URL}/crear/${templateId}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${APP_URL}/crear/${templateId}?paso=${reviewStepIndex}`,
@@ -140,6 +155,24 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
       throw new Error('Stripe no devolvió una URL de checkout.')
     }
     checkoutUrl = session.url
+
+    // after() lo manda una vez enviada la respuesta: el cliente no espera a
+    // Meta para llegar a la pantalla de pago.
+    after(() =>
+      trackMetaEvent({
+        eventName: 'InitiateCheckout',
+        eventId: `ic_${session.id}`,
+        eventSourceUrl: `${APP_URL}/crear/${templateId}`,
+        userData: metaUser,
+        customData: {
+          currency: 'MXN',
+          value: priceMXN,
+          content_name: template.name,
+          content_ids: [templateId],
+          content_type: 'product',
+        },
+      })
+    )
   } catch {
     redirect(`/crear/${templateId}?paso=${reviewStepIndex}&error=pago`)
   }

@@ -53,7 +53,9 @@ export async function generateMetadata({
   const portada = fotos?.[0]
 
   return {
-    title,
+    // `absolute` evita el template "%s | Sello" del layout: el título que
+    // ve el invitado en WhatsApp es el del evento, sin la marca pegada atrás.
+    title: { absolute: title },
     description,
     robots,
     openGraph: {

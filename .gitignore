@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# .env.example es la plantilla documentada de variables: no lleva valores
+# reales y SÍ debe versionarse, o cada clon arranca sin saber qué configurar.
+!.env.example
 
 # vercel
 .vercel

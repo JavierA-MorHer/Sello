@@ -1,8 +1,9 @@
 import { Resend } from 'resend'
 
-// "onboarding@resend.dev" funciona sin verificar dominio propio (útil para
-// probar ya mismo). En cuanto verifiques misello.com.mx en Resend, cambia esto a
-// algo como "Sello <hola@misello.com.mx>".
+// Hoy: "Sello <hola@misello.com.mx>" — misello.com.mx está verificado en
+// Resend (DKIM en resend._domainkey, return-path en send.misello.com.mx) y
+// ese buzón además RECIBE, así que las respuestas de los clientes llegan.
+// El fallback "onboarding@resend.dev" solo sirve para probar sin dominio.
 // `||` a propósito (no `??`): una env var vacía ("") sigue siendo string,
 // no undefined, así que `??` no aplicaría el fallback.
 const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS || 'Sello <onboarding@resend.dev>'

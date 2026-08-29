@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
@@ -6,6 +7,15 @@ import { TemplateCard } from '@/components/marketing/TemplateCard'
 import { RotatingHero, type HeroSlide } from '@/components/marketing/RotatingHero'
 import { FeedbackForm } from '@/components/marketing/FeedbackForm'
 import { AppMenu } from '@/components/nav/AppMenu'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://misello.com.mx'
+
+// El título y la descripción viven en app/layout.tsx; aquí solo se fija la URL
+// canónica, para que los parámetros de campaña (?utm_source=..., ?fbclid=...)
+// no se indexen como páginas distintas.
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 const HERO_SLIDES: HeroSlide[] = [
   { src: '/hero/boda.jpg', alt: 'Novios el día de su boda — invitación digital de Sello' },
@@ -60,6 +70,63 @@ const FAQS = [
   },
 ]
 
+/**
+ * Datos estructurados (schema.org). Le dicen a Google qué es esta página en
+ * lugar de que lo adivine del HTML:
+ *  - FAQPage: es el que puede pintar las preguntas desplegables en el
+ *    resultado de búsqueda. Se genera del mismo array FAQS que se renderiza,
+ *    porque Google penaliza el marcado que no coincide con lo visible.
+ *  - Organization / WebSite: identifican la marca.
+ *  - Product: precio real de arranque, leído de la base igual que la página.
+ */
+function buildJsonLd(precioDesde: number | null) {
+  const grafo: Record<string, unknown>[] = [
+    {
+      '@type': 'Organization',
+      '@id': `${APP_URL}/#organization`,
+      name: 'Sello',
+      url: APP_URL,
+      logo: `${APP_URL}/brand/sello-principal.png`,
+      areaServed: 'MX',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${APP_URL}/#website`,
+      name: 'Sello',
+      url: APP_URL,
+      inLanguage: 'es-MX',
+      publisher: { '@id': `${APP_URL}/#organization` },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ]
+
+  if (precioDesde !== null) {
+    grafo.push({
+      '@type': 'Product',
+      name: 'Invitación digital',
+      description:
+        'Invitación digital para boda, XV años, bautizo o baby shower, con confirmación de asistencia y enlace propio para compartir por WhatsApp.',
+      brand: { '@id': `${APP_URL}/#organization` },
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'MXN',
+        lowPrice: precioDesde,
+        availability: 'https://schema.org/InStock',
+        url: APP_URL,
+      },
+    })
+  }
+
+  return { '@context': 'https://schema.org', '@graph': grafo }
+}
+
 function PlusIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -95,6 +162,10 @@ export default async function LandingPage() {
     .filter((p): p is number => p !== null)
   const desdeOtras = otrasPrecios.length > 0 ? Math.min(...otrasPrecios) : null
 
+  // Precio de entrada de todo el catálogo, para el marcado Product.
+  const precios = [desdeBoda, desdeOtras].filter((p): p is number => p !== null)
+  const precioDesde = precios.length > 0 ? Math.min(...precios) : null
+
   const metadataName =
     typeof user?.user_metadata?.full_name === 'string'
       ? user.user_metadata.full_name
@@ -106,6 +177,11 @@ export default async function LandingPage() {
 
   return (
     <div className="flex-1 bg-paper text-ink">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(precioDesde)) }}
+      />
+
       {/* NAV */}
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-6">
@@ -136,13 +212,13 @@ export default async function LandingPage() {
               Bodas · XV años · Bautizos · Baby showers
             </span>
             <h1 className="max-w-lg text-4xl leading-[1.05] text-paper sm:text-6xl">
-              Tu invitación,
+              Tu invitación digital,
               <br />
               como la imaginaste
             </h1>
             <p className="max-w-md font-body text-base leading-relaxed text-paper/85 sm:text-lg">
-              Contestas unas preguntas y tu invitación queda lista para
-              compartir por WhatsApp.
+              Invitaciones digitales que se arman en minutos: contestas unas
+              preguntas y la tuya queda lista para compartir por WhatsApp.
             </p>
           </div>
         </div>
@@ -317,6 +393,17 @@ export default async function LandingPage() {
           <div className="mt-8">
             <FeedbackForm />
           </div>
+
+          <p className="mt-6 font-body text-sm text-ink/50">
+            Si prefieres, escríbenos directo a{' '}
+            <a
+              href="mailto:hola@misello.com.mx"
+              className="text-clay transition-colors hover:text-clay-light"
+            >
+              hola@misello.com.mx
+            </a>
+            .
+          </p>
         </div>
       </section>
 
@@ -341,7 +428,9 @@ export default async function LandingPage() {
             <a href="#contacto" className="transition-colors hover:text-ink">
               Contacto
             </a>
-            <span>Aviso de privacidad</span>
+            <Link href="/privacidad" className="transition-colors hover:text-ink">
+              Aviso de privacidad
+            </Link>
             <span>Términos</span>
           </div>
           <span>© {new Date().getFullYear()} Sello</span>

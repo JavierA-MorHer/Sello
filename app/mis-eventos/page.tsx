@@ -1,9 +1,17 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AppMenu } from '@/components/nav/AppMenu'
 import { getEventTitle } from '@/lib/templates/summary'
 import { DeleteDraftButton } from './delete-draft-button'
+
+// Página detrás de login: no aporta nada en el índice de Google y solo
+// gasta presupuesto de rastreo. Refuerza el Disallow de app/robots.ts.
+export const metadata: Metadata = {
+  title: 'Mis eventos',
+  robots: { index: false, follow: false },
+}
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'misello.com.mx'
 const PUBLISHED_STATUSES = ['active', 'expiring_soon']
