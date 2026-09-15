@@ -66,6 +66,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe   # probar webhook
 - [x] Base técnica de SEO — `app/robots.ts`, `app/sitemap.ts` (lista `/`, `/privacidad` y los demos públicos), canonical por página, `generateMetadata` en `/demo/[templateId]`, `noindex` en las páginas detrás de login (`/plantillas`, `/mis-eventos`, `/admin`) y JSON-LD (Organization + WebSite + FAQPage + Product) en la landing
 - [x] Aviso de privacidad (`app/privacidad`) enlazado desde el footer — **borrador sin revisión legal**: falta razón social y domicilio (los exige la LFPDPPP), ver el comentario en el archivo
 - [x] Pixel de Meta + Conversions API — `lib/analytics/meta.ts` (server) y `components/analytics/` (cliente). `PageView` y `ViewContent` por navegador; `InitiateCheckout` desde el server action del checkout; `Purchase` desde el webhook de Stripe, que es lo único que sabe que el pago se cobró. Las cookies `_fbp`/`_fbc` viajan en la metadata de la sesión de Stripe para poder atribuir la venta. Sin las env vars, todo es no-op
+- [x] Microsoft Clarity — `components/analytics/MicrosoftClarity.tsx`, montado en `app/layout.tsx`. Sin `NEXT_PUBLIC_CLARITY_ID` no renderiza nada. **Falta poner `NEXT_PUBLIC_CLARITY_ID=yiwbjk0pr8` en las env vars de Vercel y hacer redeploy** (es `NEXT_PUBLIC_*`, se incrusta en build time)
 - [ ] Plantilla "Genérico" — sigue como "próximamente" en el catálogo, no se construyó (no hay spec de qué campos debería tener; es la única que queda sin definir)
 
 ## Pendientes que requieren acceso externo (no resolubles por Claude Code)

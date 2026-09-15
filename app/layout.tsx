@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Libre_Caslon_Text, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
+import { MicrosoftClarity } from "@/components/analytics/MicrosoftClarity";
 import "./globals.css";
 
 const libreCaslonText = Libre_Caslon_Text({
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <MetaPixel />
+        <MicrosoftClarity />
         <Analytics />
       </body>
     </html>
