@@ -73,6 +73,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe   # probar webhook
 
 - [x] API keys reales de Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`) puestas en `.env.local`
 - [x] `supabase/rls-public-event-read.sql` corrido en el SQL Editor de Supabase
+- **`supabase/seed/update-template-bautizo-schema.sql`** — pendiente de correr en el SQL Editor de Supabase. Actualiza el `field_schema` de la plantilla Bautizo al rediseño de `plantillas-handoff/design_handoff_bautizo` (temas, cita bíblica, padrinos de ofrenda, ceremonia/comida, RSVP con stepper de lugares). Sin esto el wizard real (`/crear`) sigue mostrando los campos viejos aunque el componente (`Bautizo.tsx`) y el `/demo` ya están actualizados.
 - [x] `CRON_SECRET` configurado en el proyecto de Vercel (confirmado por el usuario 2026-08-24)
 - [x] Dominio comprado: `misello.com.mx` en Hostinger. Nameservers delegados a Vercel DNS (`ns1.vercel-dns.com`/`ns2.vercel-dns.com`). `misello.com.mx` y `*.misello.com.mx` verificados en Vercel, DNS propagado y HTTPS respondiendo 200 (confirmado 2026-08-24).
 - [x] Código y docs actualizados de `sello.com` a `misello.com.mx`: `.env.local` (`NEXT_PUBLIC_ROOT_DOMAIN`), `proxy.ts`, `slug-field.tsx`, páginas de éxito/mis-eventos, cron y webhook de Stripe, `resend.ts`, `app/page.tsx`, `ARCHITECTURE.md`, `PRODUCT.md`. **Falta**: setear `NEXT_PUBLIC_ROOT_DOMAIN=misello.com.mx` también en las env vars del proyecto en Vercel (no solo en `.env.local`).
