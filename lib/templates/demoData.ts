@@ -1,7 +1,8 @@
-import type { WeddingData } from '@/components/templates/wedding.types'
-import type { XvAnosData } from '@/components/templates/xvanos.types'
-import type { BautizoData } from '@/components/templates/bautizo.types'
-import type { BabyShowerData } from '@/components/templates/babyshower.types'
+import type { WeddingData } from '@/components/templates/boda/wedding.types'
+import type { XvAnosData } from '@/components/templates/xv-anos/xvanos.types'
+import type { BautizoData } from '@/components/templates/bautizo/bautizo.types'
+import type { BabyShowerData } from '@/components/templates/baby-shower/babyshower.types'
+import type { CumpleanosData } from '@/components/templates/cumpleanos/cumpleanos.types'
 
 /**
  * Datos de ejemplo por `component_key`, usados en /demo/[templateId] para
@@ -90,38 +91,42 @@ export const DEMO_DATA: Record<string, { custom_data: Record<string, unknown>; f
   },
   Bautizo: {
     custom_data: {
-      nombre_bebe: 'Emiliano',
-      nombre_padres: 'Andrea y Luis Fernando',
-      frase_bienvenida: 'Con inmensa alegría te invitamos a celebrar el bautizo de nuestro hijo.',
-      fecha_evento: '2026-06-21',
+      tema: 'agua',
+      nombre_bebe: 'Julieta',
+      fecha_evento: '2026-10-17',
+      cita: 'Dejad que los niños vengan a mí.',
+      cita_ref: 'Marcos 10:14',
+      papas: 'Daniela Ortega y Rodrigo Lara',
+      padrinos_bautizo: 'Sofía Ortega y Emilio Vega',
+      padrinos_ofrenda: [
+        { rol: 'Ropón', nombre: 'Tía Rosario' },
+        { rol: 'Vela', nombre: 'Abuelos Lara' },
+        { rol: 'Medalla', nombre: 'Familia Ortega' },
+        { rol: 'Concha', nombre: 'Tío Gabriel' },
+      ],
       hora_misa: '12:00 pm',
       iglesia_ubicacion: {
-        lugar: 'Parroquia del Sagrado Corazón',
-        direccion: 'Calle Hidalgo 45, Puebla',
-        lat: 19.0414,
-        lng: -98.2063,
+        lugar: 'Parroquia de Santa María',
+        direccion: 'Hidalgo 84, Centro, Querétaro',
+        lat: 20.5888,
+        lng: -100.3899,
         place_id: '',
       },
+      recepcion_hora: '2:00 pm',
       recepcion_ubicacion: {
         lugar: 'Casa de los abuelos',
-        direccion: 'Privada Los Pinos 12, Puebla',
-        lat: 19.0414,
-        lng: -98.2063,
+        direccion: 'Cerrada del Olivo 12, Jurica',
+        lat: 20.5888,
+        lng: -100.3899,
         place_id: '',
       },
-      eventos: [
-        { hora: '12:00 pm', titulo: 'Ceremonia religiosa' },
-        { hora: '2:00 pm', titulo: 'Comida familiar', descripcion: 'En casa de los abuelos' },
-      ],
-      padrinos: [
-        { nombre: 'Sofía Ramírez', rol: 'Madrina' },
-        { nombre: 'Carlos Medina', rol: 'Padrino' },
-      ],
-      opciones: [{ tienda: 'Amazon', url: '#' }, { tienda: 'Sobre de regalo' }],
-      fecha_limite_rsvp: '2026-06-10',
-      mensaje_rsvp: 'Confírmanos antes del 10 de junio, ¡nos encantará contar contigo!',
+      detalle_titulo: 'Vestir de blanco',
+      detalle_nota: 'Nos encantaría vernos todos de blanco en las fotos de ese día.',
+      opciones: [{ tienda: 'Liverpool', url: '#' }, { tienda: 'Amazon', url: '#' }],
+      lugares_por_invitacion: 4,
+      fecha_limite_rsvp: '2026-10-05',
     } satisfies BautizoData,
-    fotos: ['/hero/bautizo.jpg', '/hero/bautizo.jpg'],
+    fotos: ['/hero/bautizo.jpg', '/hero/bautizo.jpg', '/hero/bautizo.jpg', '/hero/bautizo.jpg'],
   },
   BabyShower: {
     custom_data: {
@@ -153,5 +158,34 @@ export const DEMO_DATA: Record<string, { custom_data: Record<string, unknown>; f
       fecha_limite_rsvp: '2026-06-25',
     } satisfies BabyShowerData,
     fotos: ['/hero/baby-shower.jpg', '/hero/baby-shower.jpg'],
+  },
+  Cumpleanos: {
+    custom_data: {
+      tema: 'mujer',
+      nombre_festejado: 'Renata',
+      edad: 30,
+      fecha_evento: '2026-11-28',
+      mensaje: 'Cumplir años sola no tiene chiste. Ven a celebrarlo conmigo.',
+      lugar_ubicacion: {
+        lugar: 'Terraza Cielo',
+        direccion: 'Av. Chapultepec 120, Guadalajara',
+        lat: 20.6736,
+        lng: -103.344,
+        place_id: '',
+      },
+      hora: '9:00 pm',
+      momentos: [
+        { hora: '9:00', titulo: 'Bienvenida y coctel' },
+        { hora: '10:00', titulo: 'Cena' },
+        { hora: '11:00', titulo: 'Pastel y brindis' },
+        { hora: '11:30', titulo: 'Baile' },
+        { hora: '2:00', titulo: 'Tornafiesta' },
+      ],
+      dresscode: 'Trae tu brillo',
+      dresscode_nota: 'Lentejuela, pedrería, lo que más destelle.',
+      lugares_por_invitacion: 2,
+      fecha_limite_rsvp: '2026-11-14',
+    } satisfies CumpleanosData,
+    fotos: ['/hero/cumpleanos.jpg', '/hero/cumpleanos.jpg'],
   },
 }
