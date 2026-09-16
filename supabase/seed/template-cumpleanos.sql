@@ -1,0 +1,121 @@
+-- Nueva plantilla: Cumpleaños (ver plantillas-handoff/design_handoff_cumpleanos).
+-- price_mxn se incluye directo porque templates.price_mxn es NOT NULL
+-- desde add-template-pricing.sql (categoría distinta de 'boda' = 400).
+
+insert into templates (name, category, component_key, price_mxn, field_schema)
+values (
+  'Cumpleaños',
+  'cumpleanos',
+  'Cumpleanos',
+  400,
+  $$
+  {
+    "sections": [
+      {
+        "id": "tema",
+        "title": "Tema",
+        "description": "Cambia colores, tipografía y el tono de los textos de toda la invitación.",
+        "fields": [
+          {
+            "key": "tema",
+            "label": "Tema",
+            "type": "select",
+            "required": true,
+            "options": [
+              { "value": "mujer", "label": "Pedrería" },
+              { "value": "hombre", "label": "Grafito" },
+              { "value": "neutro", "label": "Confeti" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "festejado",
+        "title": "El festejado",
+        "description": "Así aparecerá en la portada y en el link que compartes.",
+        "fields": [
+          { "key": "nombre_festejado", "label": "Nombre", "type": "text", "required": true },
+          { "key": "edad", "label": "Edad que cumple", "type": "number", "required": true, "min": 1, "max": 120 },
+          {
+            "key": "slug",
+            "label": "Link de tu invitación",
+            "type": "slug",
+            "sourceFields": ["nombre_festejado"]
+          }
+        ]
+      },
+      {
+        "id": "fecha",
+        "title": "Fecha",
+        "description": "Se usa para la cuenta regresiva del evento.",
+        "fields": [
+          { "key": "fecha_evento", "label": "Fecha del evento", "type": "date", "required": true }
+        ]
+      },
+      {
+        "id": "mensaje",
+        "title": "Tu mensaje",
+        "description": "Opcional — unas palabras casuales para tus invitados, justo después de la portada.",
+        "fields": [
+          { "key": "mensaje", "label": "Mensaje", "type": "textarea", "maxLength": 200 }
+        ]
+      },
+      {
+        "id": "sede",
+        "title": "Dónde",
+        "fields": [
+          { "key": "hora", "label": "Hora", "type": "time" },
+          { "key": "lugar_ubicacion", "label": "Lugar de la fiesta", "type": "ubicacion", "required": true }
+        ]
+      },
+      {
+        "id": "programa",
+        "title": "La noche",
+        "description": "Opcional — los momentos de la fiesta, en orden.",
+        "fields": [
+          {
+            "key": "momentos",
+            "label": "Momentos",
+            "type": "repeater",
+            "itemLabel": "Momento",
+            "display": "list",
+            "min": 0,
+            "max": 10,
+            "fields": [
+              { "key": "hora", "label": "Hora", "type": "time", "required": true },
+              { "key": "titulo", "label": "Qué pasa", "type": "text", "required": true }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "vestimenta",
+        "title": "Código de vestimenta",
+        "description": "Opcional — el tono festivo es a propósito, no tiene que ser formal.",
+        "fields": [
+          { "key": "dresscode", "label": "Título", "type": "text", "placeholder": "Trae tu brillo" },
+          { "key": "dresscode_nota", "label": "Nota", "type": "textarea", "maxLength": 160 }
+        ]
+      },
+      {
+        "id": "fotos",
+        "title": "Fotos",
+        "description": "Sube hasta 12 fotos para la galería.",
+        "fields": [
+          { "key": "fotos", "label": "Fotos del evento", "type": "gallery", "min": 0, "max": 12 }
+        ]
+      },
+      {
+        "id": "rsvp",
+        "title": "Confirmación de asistencia",
+        "description": "Así confirmarán tus invitados que van a asistir.",
+        "fields": [
+          { "key": "lugares_por_invitacion", "label": "Lugares por invitación", "type": "number", "min": 1, "max": 20 },
+          { "key": "fecha_limite_rsvp", "label": "Fecha límite para confirmar", "type": "date" }
+        ]
+      }
+    ]
+  }
+  $$::jsonb
+)
+returning id;

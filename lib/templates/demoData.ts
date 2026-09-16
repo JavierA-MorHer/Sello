@@ -2,6 +2,7 @@ import type { WeddingData } from '@/components/templates/wedding.types'
 import type { XvAnosData } from '@/components/templates/xvanos.types'
 import type { BautizoData } from '@/components/templates/bautizo.types'
 import type { BabyShowerData } from '@/components/templates/babyshower.types'
+import type { CumpleanosData } from '@/components/templates/cumpleanos.types'
 
 /**
  * Datos de ejemplo por `component_key`, usados en /demo/[templateId] para
@@ -157,5 +158,34 @@ export const DEMO_DATA: Record<string, { custom_data: Record<string, unknown>; f
       fecha_limite_rsvp: '2026-06-25',
     } satisfies BabyShowerData,
     fotos: ['/hero/baby-shower.jpg', '/hero/baby-shower.jpg'],
+  },
+  Cumpleanos: {
+    custom_data: {
+      tema: 'mujer',
+      nombre_festejado: 'Renata',
+      edad: 30,
+      fecha_evento: '2026-11-28',
+      mensaje: 'Cumplir años sola no tiene chiste. Ven a celebrarlo conmigo.',
+      lugar_ubicacion: {
+        lugar: 'Terraza Cielo',
+        direccion: 'Av. Chapultepec 120, Guadalajara',
+        lat: 20.6736,
+        lng: -103.344,
+        place_id: '',
+      },
+      hora: '9:00 pm',
+      momentos: [
+        { hora: '9:00', titulo: 'Bienvenida y coctel' },
+        { hora: '10:00', titulo: 'Cena' },
+        { hora: '11:00', titulo: 'Pastel y brindis' },
+        { hora: '11:30', titulo: 'Baile' },
+        { hora: '2:00', titulo: 'Tornafiesta' },
+      ],
+      dresscode: 'Trae tu brillo',
+      dresscode_nota: 'Lentejuela, pedrería, lo que más destelle.',
+      lugares_por_invitacion: 2,
+      fecha_limite_rsvp: '2026-11-14',
+    } satisfies CumpleanosData,
+    fotos: ['/hero/xv-anos.jpg', '/hero/xv-anos.jpg'],
   },
 }

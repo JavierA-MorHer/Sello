@@ -60,6 +60,15 @@ export default async function InvitadosPage({ params }: { params: Promise<{ id: 
     .eq('event_id', id)
     .order('created_at', { ascending: false })
 
+  // Solo la plantilla Cumpleaños escribe aquí (ver lib/rsvp/actions.ts,
+  // submitBirthdayMessage) — para el resto de las plantillas esta consulta
+  // simplemente no regresa filas.
+  const { data: birthdayMessages } = await admin
+    .from('birthday_messages')
+    .select('id, name, message, created_at')
+    .eq('event_id', id)
+    .order('created_at', { ascending: false })
+
   type GuestRow = {
     id: string
     name: string
@@ -145,6 +154,23 @@ export default async function InvitadosPage({ params }: { params: Promise<{ id: 
             })
           )}
         </div>
+
+        {birthdayMessages && birthdayMessages.length > 0 && (
+          <div className="mt-12">
+            <h2 className="font-display text-xl">Mensajes de cumpleaños</h2>
+            <div className="mt-4 flex flex-col gap-3">
+              {birthdayMessages.map((m) => (
+                <div key={m.id} className="rounded-sm border border-ink/8 bg-paper p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-display text-lg">{m.name || 'Anónimo'}</span>
+                    <span className="font-body text-xs text-ink/40">{formatDateTime(m.created_at)}</span>
+                  </div>
+                  <p className="mt-2 font-body text-sm text-ink/70 italic">&ldquo;{m.message}&rdquo;</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   )

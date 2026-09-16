@@ -88,3 +88,37 @@ export async function submitRsvp(
     console.error('[rsvp] No se pudo notificar al dueño del evento:', err)
   }
 }
+
+/**
+ * Server Action pública para el "mensaje de cumpleaños" (plantilla
+ * Cumpleaños) — independiente del RSVP a propósito: el invitado puede
+ * mandarlo sin confirmar asistencia, y viceversa. Por eso no toca
+ * guests/rsvp_responses y guarda en su propia tabla (ver
+ * supabase/birthday-messages.sql).
+ */
+export async function submitBirthdayMessage(eventId: string, data: { name?: string; message: string }) {
+  const message = data.message.trim()
+  if (!message) {
+    throw new Error('Escribe un mensaje.')
+  }
+
+  const supabase = createAdminClient()
+
+  const { data: event } = await supabase
+    .from('events')
+    .select('status')
+    .eq('id', eventId)
+    .single()
+
+  if (!event || !PUBLISHED_STATUSES.includes(event.status)) {
+    throw new Error('Esta invitación ya no acepta mensajes.')
+  }
+
+  const { error } = await supabase
+    .from('birthday_messages')
+    .insert({ event_id: eventId, name: data.name?.trim() || null, message })
+
+  if (error) {
+    throw new Error('No se pudo guardar tu mensaje. Intenta de nuevo.')
+  }
+}

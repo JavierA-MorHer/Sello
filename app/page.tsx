@@ -93,7 +93,7 @@ export default async function LandingPage() {
   const templates = (allTemplates ?? []).slice(0, 6)
 
   const desdeBoda = minPriceMXN(allTemplates ?? [], 'boda')
-  const otrasPrecios = ['xv_anos', 'bautizo', 'baby_shower', 'generico']
+  const otrasPrecios = ['xv_anos', 'bautizo', 'baby_shower', 'cumpleanos', 'generico']
     .map((c) => minPriceMXN(allTemplates ?? [], c))
     .filter((p): p is number => p !== null)
   const desdeOtras = otrasPrecios.length > 0 ? Math.min(...otrasPrecios) : null

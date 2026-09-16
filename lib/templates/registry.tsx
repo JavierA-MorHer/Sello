@@ -3,6 +3,7 @@ import { BodaClasica } from '@/components/templates/BodaClasica'
 import { XvAnos } from '@/components/templates/XvAnos'
 import { Bautizo } from '@/components/templates/Bautizo'
 import { BabyShower } from '@/components/templates/BabyShower'
+import { Cumpleanos } from '@/components/templates/Cumpleanos'
 
 /**
  * `custom_data` llega como jsonb sin validar desde Supabase — cada
@@ -24,4 +25,5 @@ export const TEMPLATE_COMPONENTS: Record<string, ComponentType<EventTemplateProp
   XvAnos: XvAnos as unknown as ComponentType<EventTemplateProps>,
   Bautizo: Bautizo as unknown as ComponentType<EventTemplateProps>,
   BabyShower: BabyShower as unknown as ComponentType<EventTemplateProps>,
+  Cumpleanos: Cumpleanos as unknown as ComponentType<EventTemplateProps>,
 }
