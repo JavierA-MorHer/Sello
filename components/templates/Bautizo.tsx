@@ -96,12 +96,11 @@ export function Bautizo({
   const ofrendas = d.padrinos_ofrenda ?? []
 
   return (
-    <div style={{ background: t.soft }}>
-      <div
-        className={`${display.variable} ${body.variable} mx-auto max-w-[430px]`}
-        style={{ ...bodyFont, fontWeight: 300, background: t.paper, color: INK }}
-      >
-        <style>{`
+    <div
+      className={`${display.variable} ${body.variable}`}
+      style={{ ...bodyFont, fontWeight: 300, background: t.paper, color: INK }}
+    >
+      <style>{`
           @keyframes bt-in { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
           @keyframes bt-flame {
             0%, 100% { transform: translateY(0) scale(1); opacity: .9; }
@@ -436,8 +435,7 @@ export function Bautizo({
           >
             {SELLO_BADGE_TEXT}
           </a>
-          <span style={{ width: 4, height: 4, borderRadius: 9999, background: t.accent, marginLeft: 3 }} />
-        </div>
+        <span style={{ width: 4, height: 4, borderRadius: 9999, background: t.accent, marginLeft: 3 }} />
       </div>
     </div>
   )

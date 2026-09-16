@@ -210,12 +210,11 @@ export function Cumpleanos({
   }
 
   return (
-    <div style={{ background: t.soft }}>
-      <div
-        className={`${serif.variable} ${sans.variable} mx-auto max-w-[430px]`}
-        style={{ fontFamily: 'var(--font-tpl-sans)', fontWeight: 300, background: t.paper, color: t.ink, position: 'relative', overflow: 'hidden' }}
-      >
-        <style>{`
+    <div
+      className={`${serif.variable} ${sans.variable}`}
+      style={{ fontFamily: 'var(--font-tpl-sans)', fontWeight: 300, background: t.paper, color: t.ink, position: 'relative', overflow: 'hidden' }}
+    >
+      <style>{`
           @keyframes cp-in { 0% { opacity: 0; transform: translateY(14px); } 100% { opacity: 1; transform: translateY(0); } }
           @keyframes cp-fade { from { opacity: 0; } to { opacity: 1; } }
           @keyframes cp-confetti {
@@ -580,6 +579,5 @@ export function Cumpleanos({
           </div>
         )}
       </div>
-    </div>
   )
 }
