@@ -245,52 +245,6 @@ export function Cumpleanos({
           }
         `}</style>
 
-        {/* CONFETI DE ENTRADA */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 6, pointerEvents: 'none' }}>
-          {CONFETTI_PIECES.map((p) => (
-            <span
-              key={p.key}
-              data-cp-confetti
-              style={
-                {
-                  position: 'absolute',
-                  left: '50%',
-                  bottom: 40,
-                  width: p.shape === 1 ? 7 : 5,
-                  height: p.shape === 2 ? 12 : p.shape === 1 ? 7 : 14,
-                  borderRadius: p.shape === 1 ? 9999 : 2,
-                  background: p.color,
-                  '--peak-x': `${p.peakX}px`,
-                  '--peak-y': `${p.peakY}px`,
-                  '--final-x': `${p.finalX}px`,
-                  '--final-y': `${p.finalY}px`,
-                  '--rot': `${p.rot}deg`,
-                  '--dur': `${p.duration}s`,
-                  '--delay': `${p.delay}s`,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </div>
-
-        {/* CHISPAS DE FONDO (solo mujer) */}
-        {t.destellos && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
-            {SPARK_PIECES.map((s) => (
-              <Sparkle
-                key={s.key}
-                size={s.size}
-                color={s.color}
-                style={{
-                  left: `${s.left}%`,
-                  top: `${s.top}%`,
-                  animation: `cp-spark ${s.duration}s ease-in-out ${s.delay}s infinite`,
-                }}
-              />
-            ))}
-          </div>
-        )}
-
         {/* GUIRNALDA SUPERIOR (solo mujer) */}
         {t.guirnalda && (
           <div
@@ -324,6 +278,55 @@ export function Cumpleanos({
           data-cp-anim
           style={{ position: 'relative', zIndex: 2, padding: '54px 30px 44px', textAlign: 'center', overflow: 'hidden', animation: 'cp-in 1s ease-out both' }}
         >
+          {/* CONFETI DE ENTRADA — acotado al hero (lo que se ve al abrir la
+              invitación), no a toda la página: en un scroll largo, "toda la
+              tarjeta" del prototipo (una vista de 390×844) sería invisible si
+              se ancla a la altura completa del documento. */}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none' }}>
+            {CONFETTI_PIECES.map((p) => (
+              <span
+                key={p.key}
+                data-cp-confetti
+                style={
+                  {
+                    position: 'absolute',
+                    left: '50%',
+                    bottom: 40,
+                    width: p.shape === 1 ? 7 : 5,
+                    height: p.shape === 2 ? 12 : p.shape === 1 ? 7 : 14,
+                    borderRadius: p.shape === 1 ? 9999 : 2,
+                    background: p.color,
+                    '--peak-x': `${p.peakX}px`,
+                    '--peak-y': `${p.peakY}px`,
+                    '--final-x': `${p.finalX}px`,
+                    '--final-y': `${p.finalY}px`,
+                    '--rot': `${p.rot}deg`,
+                    '--dur': `${p.duration}s`,
+                    '--delay': `${p.delay}s`,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
+
+          {/* CHISPAS DE FONDO (solo mujer) — mismo motivo, acotadas al hero. */}
+          {t.destellos && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
+              {SPARK_PIECES.map((s) => (
+                <Sparkle
+                  key={s.key}
+                  size={s.size}
+                  color={s.color}
+                  style={{
+                    left: `${s.left}%`,
+                    top: `${s.top}%`,
+                    animation: `cp-spark ${s.duration}s ease-in-out ${s.delay}s infinite`,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
           {t.dark && (
             <>
               <span style={{ position: 'absolute', top: 0, left: 30, right: 30, height: 1, background: t.hair }} />
