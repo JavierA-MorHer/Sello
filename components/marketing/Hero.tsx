@@ -26,7 +26,7 @@ export function Hero() {
           </h1>
           <p className="max-w-md font-body text-base leading-relaxed text-paper/85 sm:text-lg">
             Invitaciones digitales que se arman en minutos: contestas unas
-            preguntas y la tuya queda lista para compartir por WhatsApp.
+            preguntas y queda lista para compartir por WhatsApp.
           </p>
         </div>
       </div>
