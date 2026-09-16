@@ -17,7 +17,7 @@ export function Hero() {
         />
         <div className="rise-in relative z-10 mx-auto flex h-full max-w-3xl flex-col justify-end gap-4 px-4 pb-16 sm:px-6 sm:pb-20">
           <span className="font-body text-xs font-semibold tracking-[0.16em] text-paper/80 uppercase">
-            Bodas · XV años · Bautizos · Baby showers
+            Bodas · Cumpleaños · XV años · Bautizos · Baby showers
           </span>
           <h1 className="max-w-lg text-4xl leading-[1.05] text-paper sm:text-6xl">
             Tu invitación digital,
