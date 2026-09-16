@@ -1,8 +1,8 @@
-import type { WeddingData } from '@/components/templates/wedding.types'
-import type { XvAnosData } from '@/components/templates/xvanos.types'
-import type { BautizoData } from '@/components/templates/bautizo.types'
-import type { BabyShowerData } from '@/components/templates/babyshower.types'
-import type { CumpleanosData } from '@/components/templates/cumpleanos.types'
+import type { WeddingData } from '@/components/templates/boda/wedding.types'
+import type { XvAnosData } from '@/components/templates/xv-anos/xvanos.types'
+import type { BautizoData } from '@/components/templates/bautizo/bautizo.types'
+import type { BabyShowerData } from '@/components/templates/baby-shower/babyshower.types'
+import type { CumpleanosData } from '@/components/templates/cumpleanos/cumpleanos.types'
 
 /**
  * Datos de ejemplo por `component_key`, usados en /demo/[templateId] para
@@ -186,6 +186,6 @@ export const DEMO_DATA: Record<string, { custom_data: Record<string, unknown>; f
       lugares_por_invitacion: 2,
       fecha_limite_rsvp: '2026-11-14',
     } satisfies CumpleanosData,
-    fotos: ['/hero/xv-anos.jpg', '/hero/xv-anos.jpg'],
+    fotos: ['/hero/cumpleanos.jpg', '/hero/cumpleanos.jpg'],
   },
 }

@@ -1,9 +1,9 @@
 import type { ComponentType } from 'react'
-import { BodaClasica } from '@/components/templates/BodaClasica'
-import { XvAnos } from '@/components/templates/XvAnos'
-import { Bautizo } from '@/components/templates/Bautizo'
-import { BabyShower } from '@/components/templates/BabyShower'
-import { Cumpleanos } from '@/components/templates/Cumpleanos'
+import { BodaClasica } from '@/components/templates/boda/BodaClasica'
+import { XvAnos } from '@/components/templates/xv-anos/XvAnos'
+import { Bautizo } from '@/components/templates/bautizo/Bautizo'
+import { BabyShower } from '@/components/templates/baby-shower/BabyShower'
+import { Cumpleanos } from '@/components/templates/cumpleanos/Cumpleanos'
 
 /**
  * `custom_data` llega como jsonb sin validar desde Supabase — cada

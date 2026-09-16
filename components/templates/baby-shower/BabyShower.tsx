@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Baloo_2, Nunito } from 'next/font/google'
 import type { BabyShowerData, BabyShowerTema } from './babyshower.types'
 import { BabyShowerRsvp } from './BabyShowerRsvp'
-import { MapaUbicacion } from './MapaUbicacion'
+import { MapaUbicacion } from '../shared/MapaUbicacion'
 import { buildDirectionsUrl } from '@/lib/maps/urls'
 import { SELLO_BADGE_TEXT, SELLO_BADGE_URL } from '@/lib/marketing/sello-badge'
 

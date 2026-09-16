@@ -48,7 +48,7 @@ export function Hero() {
                   RSVP activo
                 </span>
                 <span className="rounded-full bg-ink/6 px-2.5 py-1 font-body text-[10px] font-semibold text-ink/60">
-                  javier-nayeli.misello.com.mx
+                  tu-link-personalizado.misello.com.mx
                 </span>
               </div>
             </div>

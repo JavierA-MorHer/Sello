@@ -29,7 +29,7 @@ export function PricingSection({
               <div>
                 <div className="font-display text-3xl">{formatMXN(desdeOtras)}</div>
                 <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                  XV años, bautizos y baby shower
+                  Cumpleaños, XV años, bautizos y baby shower
                 </div>
               </div>
             )}
