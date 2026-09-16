@@ -82,6 +82,16 @@ export default async function DemoPage({
     notFound()
   }
 
+  // El demo es público (sin login) — casi siempre se llega aquí desde la
+  // landing, no desde /plantillas (que si requiere sesión). El link de
+  // "volver" no puede asumir que hay sesión, o manda al visitante anónimo a
+  // /login en lugar de a donde venía.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const backHref = user ? '/plantillas' : '/#plantillas'
+
   const TemplateComponent = TEMPLATE_COMPONENTS[template.component_key]
   const demo = DEMO_DATA[template.component_key]
 
@@ -116,7 +126,7 @@ export default async function DemoPage({
 
       <div className="sticky top-0 z-30 flex items-center justify-between bg-ink px-4 py-3.5 sm:px-6">
         <Link
-          href="/plantillas"
+          href={backHref}
           className="font-body text-sm font-semibold text-paper/85 transition-colors hover:text-paper"
         >
           ← Plantillas
