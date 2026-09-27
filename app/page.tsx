@@ -89,7 +89,8 @@ export default async function LandingPage() {
       .order('created_at', { ascending: true }),
     supabase.auth.getUser(),
   ])
-  const user = userData.user
+  // Un anónimo (borrador sin cuenta) se trata como visitante en la landing.
+  const user = userData.user?.is_anonymous ? null : userData.user
   const templates = (allTemplates ?? []).slice(0, 6)
 
   const desdeBoda = minPriceMXN(allTemplates ?? [], 'boda')

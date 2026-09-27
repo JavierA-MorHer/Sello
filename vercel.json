@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/expire-events",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-anonymous",
+      "schedule": "30 9 * * *"
     }
   ]
 }

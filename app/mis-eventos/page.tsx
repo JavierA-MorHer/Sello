@@ -37,7 +37,7 @@ export default async function MisEventosPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     redirect('/login?next=/mis-eventos')
   }
 

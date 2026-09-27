@@ -70,7 +70,9 @@ export async function createCheckoutSession(eventId: string, reviewStepIndex: nu
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  // El pago siempre es con cuenta real: el wizard pide login antes de llegar
+  // aquí, esto solo cubre llamadas directas.
+  if (!user || user.is_anonymous) {
     redirect('/login')
   }
 

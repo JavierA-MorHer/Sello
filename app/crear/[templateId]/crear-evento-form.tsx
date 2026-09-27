@@ -7,11 +7,26 @@ import type { Field, FieldSchema } from '@/lib/templates/types'
 import { DynamicForm } from '@/components/forms/DynamicForm'
 import { AppMenu } from '@/components/nav/AppMenu'
 import { Modal } from '@/components/shared/Modal'
+import { LoginPanel } from '@/components/auth/LoginPanel'
 import { autosaveDraft, createCheckoutSession } from './actions'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 const AUTOSAVE_DEBOUNCE_MS = 1000
+
+// A partir de qué paso se le sugiere al anónimo crear cuenta: ya invirtió
+// tiempo y perder el borrador le dolería, pero todavía no llega a pagar.
+const ACCOUNT_BANNER_FROM_STEP = 2
+
+type LoginReason = 'guardar' | 'pagar'
+
+function BookmarkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+      <path strokeLinejoin="round" d="M6 4h12v16l-6-4-6 4z" />
+    </svg>
+  )
+}
 
 function formatDateEs(iso: unknown): string {
   if (typeof iso !== 'string' || !iso) return ''
@@ -125,12 +140,15 @@ function CountdownPreview({ fechaEvento }: { fechaEvento: unknown }) {
 export function CrearEventoForm({
   eventId,
   templateId,
+  isAnonymous,
   priceRange,
   schema,
   defaultValues,
 }: {
   eventId: string
   templateId: string
+  /** Borrador sin cuenta (usuario anónimo de Supabase) — ver lib/auth/anonymous.ts. */
+  isAnonymous: boolean
   priceRange: string
   schema: FieldSchema
   defaultValues: Record<string, unknown>
@@ -149,6 +167,8 @@ export function CrearEventoForm({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [missingFieldAlert, setMissingFieldAlert] = useState<{ stepIndex: number; label: string } | null>(null)
   const [slugNotice, setSlugNotice] = useState<string | null>(null)
+  const [loginReason, setLoginReason] = useState<LoginReason | null>(null)
+  const [accountBannerDismissed, setAccountBannerDismissed] = useState(false)
   const slugNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const { register, control, watch, getValues } = useForm({ defaultValues })
@@ -179,7 +199,26 @@ export function CrearEventoForm({
       return
     }
 
+    // Pagar requiere cuenta: el comprobante, los RSVP y los avisos de
+    // vencimiento llegan a su correo.
+    if (isAnonymous) {
+      setLoginReason('pagar')
+      return
+    }
+
     startPayTransition(() => createCheckoutSession(eventId, stepIndex))
+  }
+
+  // Login sin salir de la página (Google One Tap). El borrador ya se pasó a
+  // la cuenta en finishLoginAction, así que el mismo eventId sigue sirviendo.
+  async function handleSignedIn() {
+    const reason = loginReason
+    setLoginReason(null)
+    if (reason === 'pagar') {
+      startPayTransition(() => createCheckoutSession(eventId, stepIndex))
+      return
+    }
+    router.refresh()
   }
 
   async function openPreview() {
@@ -238,10 +277,14 @@ export function CrearEventoForm({
         <div className="mx-auto flex max-w-2xl flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <AppMenu />
+              <AppMenu isAnonymous={isAnonymous} />
               <button
                 type="button"
-                onClick={() => (stepIndex === 0 ? router.push('/plantillas') : goToStep(stepIndex - 1))}
+                onClick={() =>
+                  stepIndex === 0
+                    ? router.push(isAnonymous ? `/demo/${templateId}` : '/plantillas')
+                    : goToStep(stepIndex - 1)
+                }
                 className="font-body text-sm font-semibold text-ink/70 transition-colors hover:text-ink"
               >
                 ← Atrás
@@ -268,12 +311,57 @@ export function CrearEventoForm({
             ))}
           </div>
 
-          <SaveStatusLine status={status} errorMessage={errorMessage} slugNotice={slugNotice} />
+          <div className="flex items-center justify-between gap-3">
+            <SaveStatusLine
+              status={status}
+              errorMessage={errorMessage}
+              slugNotice={slugNotice}
+            />
+            {isAnonymous && (
+              <button
+                type="button"
+                onClick={() => setLoginReason('guardar')}
+                className="flex flex-none items-center gap-1.5 rounded-sm bg-ink px-3 py-2 font-body text-xs font-semibold text-paper transition-colors hover:bg-clay"
+              >
+                <BookmarkIcon />
+                Guardar mi progreso
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* BODY */}
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5 px-4 py-6 sm:px-6">
+        {isAnonymous && !accountBannerDismissed && stepIndex >= ACCOUNT_BANNER_FROM_STEP && (
+          <div className="flex items-start gap-3 rounded-sm border border-clay/25 bg-clay/8 p-4">
+            <div className="flex flex-1 flex-col gap-2">
+              <span className="font-body text-sm font-semibold text-ink">
+                Crea tu cuenta para no perder tu invitación
+              </span>
+              <span className="font-body text-xs leading-relaxed text-ink/70">
+                Entra con tu cuenta y retoma tu invitación cuando quieras,
+                desde cualquier dispositivo.
+              </span>
+              <button
+                type="button"
+                onClick={() => setLoginReason('guardar')}
+                className="self-start rounded-sm bg-ink px-3.5 py-2 font-body text-xs font-semibold text-paper transition-colors hover:bg-clay"
+              >
+                Crear cuenta gratis
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAccountBannerDismissed(true)}
+              aria-label="Cerrar aviso"
+              className="font-body text-lg leading-none text-ink/40 transition-colors hover:text-ink"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {isReview ? (
           <>
             <div>
@@ -398,6 +486,29 @@ export function CrearEventoForm({
           }
         >
           Te falta completar &ldquo;{missingFieldAlert.label}&rdquo; antes de publicar.
+        </Modal>
+      )}
+
+      {loginReason && (
+        <Modal
+          title={loginReason === 'pagar' ? 'Un paso antes de pagar' : 'Guarda tu invitación'}
+          onClose={() => setLoginReason(null)}
+          actions={
+            <button
+              type="button"
+              onClick={() => setLoginReason(null)}
+              className="rounded-sm px-4 py-2 font-body text-xs font-semibold text-ink/60 transition-colors hover:text-ink"
+            >
+              Ahora no
+            </button>
+          }
+        >
+          <p className="mb-5">
+            {loginReason === 'pagar'
+              ? 'Entra con tu cuenta para pagar: ahí te llegan el comprobante y las confirmaciones de tus invitados. Todo lo que llenaste se queda igual.'
+              : 'Entra con tu cuenta y retoma tu invitación cuando quieras, desde cualquier dispositivo. Todo lo que llenaste se queda igual.'}
+          </p>
+          <LoginPanel next={`/crear/${templateId}?paso=${stepIndex}`} onSignedIn={handleSignedIn} />
         </Modal>
       )}
     </div>

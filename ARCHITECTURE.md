@@ -160,6 +160,18 @@ export async function GET(request: Request) {
 }
 ```
 
+### 5.1 Borradores sin cuenta (usuario anónimo)
+
+El login ya no es la puerta de entrada al wizard: la mayoría abandonaba ahí, antes de invertir nada.
+
+- `/crear/[templateId]` sin sesión llama a `signInAnonymously()` desde el navegador (`empezar-anonimo.tsx`). El anónimo es un usuario real en `auth.users` con `is_anonymous = true`, así que **el RLS existente (`owner_id = auth.uid()`) aplica sin cambios** a `events` y a Storage. Nada vive en `localStorage`: la sesión va en las cookies de Supabase, como la de cualquier usuario.
+- El anónimo puede llenar, subir fotos, autoguardar y ver el preview. Fuera del wizard (`/mis-eventos`, `/plantillas`, `/admin`, landing) se trata como "sin sesión".
+- Se pide cuenta al tocar "Guardar mi progreso", en el banner que aparece desde el paso 3 y siempre antes de pagar (`createCheckoutSession` rechaza anónimos).
+- Traspaso (`lib/auth/anonymous.ts`): antes de iniciar sesión se guarda el id del anónimo en una cookie httpOnly firmada con HMAC. Al completar el login (`/auth/callback`, `/auth/confirm` o `finishLoginAction` para One Tap) sus borradores `draft` pasan a la cuenta real con la service role, y el anónimo se borra. Las fotos no se mueven: su ruta es `{event_id}/…`.
+- Regreso después del login: el destino (p. ej. `/crear/{id}?paso=N`, el resumen) se guarda en la cookie httpOnly `sello_login_next` (`lib/auth/login-next.ts`), no como `?next=` en la URL de retorno. Así `/auth/callback` y `/auth/confirm` llegan limpias y coinciden con las Redirect URLs de Supabase; con query string, Supabase podía descartarlas y mandar al Site URL (el home).
+- Limpieza: `app/api/cron/cleanup-anonymous` (diario) borra anónimos con más de 30 días, sus borradores y sus fotos.
+- Google: One Tap y el botón oficial de Google Identity Services, con `signInWithIdToken` (sin redirect). Sin `NEXT_PUBLIC_GOOGLE_CLIENT_ID` se usa `signInWithOAuth` con redirect.
+
 ## 6. Pagos
 
 - **Stripe Checkout** (hosted) — evita construir un formulario de tarjeta propio.

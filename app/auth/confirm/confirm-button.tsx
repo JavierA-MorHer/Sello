@@ -11,7 +11,7 @@ export function ConfirmButton({
 }: {
   tokenHash: string
   type: EmailOtpType
-  next: string
+  next: string | null
 }) {
   const [isPending, startTransition] = useTransition()
 
