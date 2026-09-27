@@ -23,7 +23,7 @@ export default async function InvitadosPage({ params }: { params: Promise<{ id: 
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     redirect(`/login?next=/mis-eventos/${id}/invitados`)
   }
 

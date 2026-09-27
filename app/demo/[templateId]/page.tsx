@@ -68,7 +68,7 @@ export default async function DemoPage({
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const backHref = user ? '/plantillas' : '/#plantillas'
+  const backHref = user && !user.is_anonymous ? '/plantillas' : '/#plantillas'
 
   const TemplateComponent = TEMPLATE_COMPONENTS[template.component_key]
   const demo = DEMO_DATA[template.component_key]

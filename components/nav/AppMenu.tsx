@@ -49,10 +49,13 @@ function MenuLink({
 export function AppMenu({
   displayName,
   isAdmin = false,
+  isAnonymous = false,
   variant = 'light',
 }: {
   displayName?: string | null
   isAdmin?: boolean
+  /** Borrador sin cuenta: no hay "Mis eventos" ni sesión que cerrar. */
+  isAnonymous?: boolean
   variant?: 'light' | 'dark'
 }) {
   const [open, setOpen] = useState(false)
@@ -106,26 +109,32 @@ export function AppMenu({
               <MenuLink href="/" onNavigate={close}>
                 Inicio
               </MenuLink>
-              <MenuLink href="/plantillas" onNavigate={close}>
+              <MenuLink href={isAnonymous ? '/#plantillas' : '/plantillas'} onNavigate={close}>
                 Plantillas
               </MenuLink>
-              <MenuLink href="/mis-eventos" onNavigate={close}>
-                Mis eventos
-              </MenuLink>
+              {!isAnonymous && (
+                <MenuLink href="/mis-eventos" onNavigate={close}>
+                  Mis eventos
+                </MenuLink>
+              )}
               {isAdmin && (
                 <MenuLink href="/admin" onNavigate={close}>
                   Admin
                 </MenuLink>
               )}
-              <div className="my-1 h-px bg-ink/10" />
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => startTransition(() => signOutAction())}
-                className="w-full rounded-sm px-3 py-2.5 text-left font-body text-sm font-semibold text-error transition-colors hover:bg-error/10 disabled:opacity-50"
-              >
-                {isPending ? 'Cerrando sesión…' : 'Cerrar sesión'}
-              </button>
+              {!isAnonymous && (
+                <>
+                  <div className="my-1 h-px bg-ink/10" />
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => startTransition(() => signOutAction())}
+                    className="w-full rounded-sm px-3 py-2.5 text-left font-body text-sm font-semibold text-error transition-colors hover:bg-error/10 disabled:opacity-50"
+                  >
+                    {isPending ? 'Cerrando sesión…' : 'Cerrar sesión'}
+                  </button>
+                </>
+              )}
             </div>
           </>,
           document.body

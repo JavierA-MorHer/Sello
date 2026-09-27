@@ -1,8 +1,9 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { FieldSchema } from '@/lib/templates/types'
 import { formatMXN } from '@/lib/templates/pricing'
 import { CrearEventoForm } from './crear-evento-form'
+import { EmpezarAnonimo } from './empezar-anonimo'
 
 export default async function CrearEventoPage({
   params,
@@ -12,14 +13,6 @@ export default async function CrearEventoPage({
   const { templateId } = await params
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect(`/login?next=${encodeURIComponent(`/crear/${templateId}`)}`)
-  }
-
   const { data: template } = await supabase
     .from('templates')
     .select('id, category, field_schema, price_mxn')
@@ -28,6 +21,17 @@ export default async function CrearEventoPage({
 
   if (!template) {
     notFound()
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Sin sesión se empieza como anónimo — la cuenta se pide hasta guardar o
+  // pagar (ver lib/auth/anonymous.ts). La plantilla se valida antes para no
+  // crear usuarios por links rotos.
+  if (!user) {
+    return <EmpezarAnonimo templateId={templateId} />
   }
 
   // .maybeSingle() lanza error si hay más de una fila y aquí se ignoraba el
@@ -76,6 +80,7 @@ export default async function CrearEventoPage({
       <CrearEventoForm
         eventId={draft.id}
         templateId={templateId}
+        isAnonymous={!!user.is_anonymous}
         priceRange={formatMXN(template.price_mxn)}
         schema={template.field_schema as FieldSchema}
         defaultValues={{
