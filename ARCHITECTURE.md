@@ -168,6 +168,7 @@ El login ya no es la puerta de entrada al wizard: la mayoría abandonaba ahí, a
 - El anónimo puede llenar, subir fotos, autoguardar y ver el preview. Fuera del wizard (`/mis-eventos`, `/plantillas`, `/admin`, landing) se trata como "sin sesión".
 - Se pide cuenta al tocar "Guardar mi progreso", en el banner que aparece desde el paso 3 y siempre antes de pagar (`createCheckoutSession` rechaza anónimos).
 - Traspaso (`lib/auth/anonymous.ts`): antes de iniciar sesión se guarda el id del anónimo en una cookie httpOnly firmada con HMAC. Al completar el login (`/auth/callback`, `/auth/confirm` o `finishLoginAction` para One Tap) sus borradores `draft` pasan a la cuenta real con la service role, y el anónimo se borra. Las fotos no se mueven: su ruta es `{event_id}/…`.
+- Regreso después del login: el destino (p. ej. `/crear/{id}?paso=N`, el resumen) se guarda en la cookie httpOnly `sello_login_next` (`lib/auth/login-next.ts`), no como `?next=` en la URL de retorno. Así `/auth/callback` y `/auth/confirm` llegan limpias y coinciden con las Redirect URLs de Supabase; con query string, Supabase podía descartarlas y mandar al Site URL (el home).
 - Limpieza: `app/api/cron/cleanup-anonymous` (diario) borra anónimos con más de 30 días, sus borradores y sus fotos.
 - Google: One Tap y el botón oficial de Google Identity Services, con `signInWithIdToken` (sin redirect). Sin `NEXT_PUBLIC_GOOGLE_CLIENT_ID` se usa `signInWithOAuth` con redirect.
 

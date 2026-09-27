@@ -20,6 +20,14 @@ const ACCOUNT_BANNER_FROM_STEP = 2
 
 type LoginReason = 'guardar' | 'pagar'
 
+function BookmarkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+      <path strokeLinejoin="round" d="M6 4h12v16l-6-4-6 4z" />
+    </svg>
+  )
+}
+
 function formatDateEs(iso: unknown): string {
   if (typeof iso !== 'string' || !iso) return ''
   const date = new Date(`${iso}T00:00:00`)
@@ -67,12 +75,10 @@ function SaveStatusLine({
   status,
   errorMessage,
   slugNotice,
-  isAnonymous,
 }: {
   status: SaveStatus
   errorMessage: string | null
   slugNotice: string | null
-  isAnonymous: boolean
 }) {
   if (slugNotice) {
     return <p className="h-4 font-body text-[11px] text-clay">{slugNotice}</p>
@@ -80,7 +86,7 @@ function SaveStatusLine({
   return (
     <p className="h-4 font-body text-[11px] text-ink/40">
       {status === 'saving' && 'Guardando…'}
-      {status === 'saved' && (isAnonymous ? 'Guardado en este navegador' : 'Cambios guardados')}
+      {status === 'saved' && 'Cambios guardados'}
       {status === 'error' && (
         <span className="text-error">{errorMessage ?? 'No se pudo guardar — revisa tu conexión'}</span>
       )}
@@ -310,14 +316,14 @@ export function CrearEventoForm({
               status={status}
               errorMessage={errorMessage}
               slugNotice={slugNotice}
-              isAnonymous={isAnonymous}
             />
             {isAnonymous && (
               <button
                 type="button"
                 onClick={() => setLoginReason('guardar')}
-                className="font-body text-[11px] font-semibold text-clay underline-offset-2 hover:underline"
+                className="flex flex-none items-center gap-1.5 rounded-sm bg-ink px-3 py-2 font-body text-xs font-semibold text-paper transition-colors hover:bg-clay"
               >
+                <BookmarkIcon />
                 Guardar mi progreso
               </button>
             )}
@@ -334,8 +340,8 @@ export function CrearEventoForm({
                 Crea tu cuenta para no perder tu invitación
               </span>
               <span className="font-body text-xs leading-relaxed text-ink/70">
-                Tu avance está guardado solo en este navegador. Con una cuenta
-                lo retomas desde cualquier dispositivo.
+                Entra con tu cuenta y retoma tu invitación cuando quieras,
+                desde cualquier dispositivo.
               </span>
               <button
                 type="button"

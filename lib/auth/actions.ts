@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { claimAnonymousDrafts, rememberAnonymousUser } from './anonymous'
+import { consumeLoginNext, rememberLoginNext } from './login-next'
 
 export async function signOutAction() {
   const supabase = await createClient()
@@ -10,8 +11,12 @@ export async function signOutAction() {
   redirect('/login')
 }
 
-/** Antes de cualquier login: recuerda al usuario anónimo para heredarle su borrador. */
-export async function prepareLoginAction() {
+/**
+ * Antes de cualquier login: recuerda a dónde regresar y, si es anónimo, al
+ * usuario para heredarle su borrador.
+ */
+export async function prepareLoginAction(next: string) {
+  await rememberLoginNext(next)
   const supabase = await createClient()
   const {
     data: { user },
@@ -29,4 +34,7 @@ export async function finishLoginAction() {
     data: { user },
   } = await supabase.auth.getUser()
   await claimAnonymousDrafts(user)
+  // Aquí no hay redirect del server (el panel decide qué sigue), pero se
+  // limpia para que un login posterior no herede este destino.
+  await consumeLoginNext()
 }

@@ -81,12 +81,14 @@ function GoogleIcon() {
 
 function GoogleRedirectButton({ next }: { next: string }) {
   async function handleGoogle() {
-    await prepareLoginAction()
+    await prepareLoginAction(next)
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        // Sin ?next=: el destino va en cookie (lib/auth/login-next.ts) para
+        // que esta URL coincida con las Redirect URLs de Supabase.
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
   }
@@ -103,16 +105,16 @@ function GoogleRedirectButton({ next }: { next: string }) {
   )
 }
 
-function GoogleOneTap({ onSignedIn }: { onSignedIn: () => Promise<void> }) {
+function GoogleOneTap({ next, onSignedIn }: { next: string; onSignedIn: () => Promise<void> }) {
   const buttonRef = useRef<HTMLDivElement>(null)
   // GIS se inicializa una sola vez; el callback lee la versión más reciente.
-  const onSignedInRef = useRef(onSignedIn)
+  const latestRef = useRef({ next, onSignedIn })
   const [error, setError] = useState(false)
   const [failedToLoad, setFailedToLoad] = useState(false)
 
   useEffect(() => {
-    onSignedInRef.current = onSignedIn
-  }, [onSignedIn])
+    latestRef.current = { next, onSignedIn }
+  }, [next, onSignedIn])
 
   useEffect(() => {
     let cancelled = false
@@ -137,7 +139,7 @@ function GoogleOneTap({ onSignedIn }: { onSignedIn: () => Promise<void> }) {
         context: 'signin',
         callback: async ({ credential }: GoogleCredentialResponse) => {
           setError(false)
-          await prepareLoginAction()
+          await prepareLoginAction(latestRef.current.next)
           const { error: signInError } = await createClient().auth.signInWithIdToken({
             provider: 'google',
             token: credential,
@@ -148,7 +150,7 @@ function GoogleOneTap({ onSignedIn }: { onSignedIn: () => Promise<void> }) {
             return
           }
           await finishLoginAction()
-          await onSignedInRef.current()
+          await latestRef.current.onSignedIn()
         },
       })
 
@@ -217,12 +219,12 @@ export function LoginPanel({
     e.preventDefault()
     setStatus('sending')
 
-    await prepareLoginAction()
+    await prepareLoginAction(next)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     })
 
@@ -232,7 +234,7 @@ export function LoginPanel({
   return (
     <div className="flex flex-col gap-6">
       {GOOGLE_CLIENT_ID ? (
-        <GoogleOneTap onSignedIn={handleSignedIn} />
+        <GoogleOneTap next={next} onSignedIn={handleSignedIn} />
       ) : (
         <GoogleRedirectButton next={next} />
       )}
