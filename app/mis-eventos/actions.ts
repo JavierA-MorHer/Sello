@@ -11,7 +11,7 @@ export async function deleteDraftEvent(eventId: string) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     throw new Error('No autenticado.')
   }
 

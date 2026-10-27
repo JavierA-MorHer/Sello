@@ -1,12 +1,20 @@
+import { redirect } from 'next/navigation'
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { ConfirmButton } from './confirm-button'
 
 export default async function ConfirmPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token_hash?: string; type?: string; next?: string }>
+  searchParams: Promise<{ token_hash?: string; type?: string; next?: string; code?: string }>
 }) {
-  const { token_hash, type, next } = await searchParams
+  const { token_hash, type, next, code } = await searchParams
+
+  // Con la plantilla de correo por defecto ({{ .ConfirmationURL }}) Supabase
+  // verifica el link del lado suyo y regresa con ?code= (PKCE) en vez de
+  // token_hash. Ese canje ya lo hace /auth/callback.
+  if (code && !token_hash) {
+    redirect(`/auth/callback?code=${encodeURIComponent(code)}`)
+  }
 
   if (!token_hash || !type) {
     return (
@@ -32,7 +40,7 @@ export default async function ConfirmPage({
         <ConfirmButton
           tokenHash={token_hash}
           type={type as EmailOtpType}
-          next={next ?? '/plantillas'}
+          next={next ?? null}
         />
       </div>
     </main>

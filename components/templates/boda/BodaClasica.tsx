@@ -1,9 +1,9 @@
 import { Italiana, Work_Sans, Beau_Rivage } from 'next/font/google'
-import { TemplatePhoto } from './TemplatePhoto'
-import { RsvpForm } from './RsvpForm'
-import { EventCountdown } from './EventCountdown'
+import { TemplatePhoto } from '../shared/TemplatePhoto'
+import { RsvpForm } from '../shared/RsvpForm'
+import { EventCountdown } from '../shared/EventCountdown'
 import type { WeddingData } from './wedding.types'
-import { MapaUbicacion } from './MapaUbicacion'
+import { MapaUbicacion } from '../shared/MapaUbicacion'
 import { buildDirectionsUrl } from '@/lib/maps/urls'
 import { SELLO_BADGE_TEXT, SELLO_BADGE_URL } from '@/lib/marketing/sello-badge'
 

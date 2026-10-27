@@ -27,7 +27,7 @@ export default async function CheckoutSuccessPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     redirect('/login')
   }
 

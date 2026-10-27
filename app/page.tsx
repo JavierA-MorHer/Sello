@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { formatMXN, minPriceMXN } from '@/lib/templates/pricing'
-import { TemplateCard } from '@/components/marketing/TemplateCard'
-import { RotatingHero, type HeroSlide } from '@/components/marketing/RotatingHero'
-import { FeedbackForm } from '@/components/marketing/FeedbackForm'
-import { AppMenu } from '@/components/nav/AppMenu'
+import { minPriceMXN } from '@/lib/templates/pricing'
+import { FAQS } from '@/lib/marketing/landing-content'
+import { SiteHeader } from '@/components/marketing/SiteHeader'
+import { Hero } from '@/components/marketing/Hero'
+import { HowItWorks } from '@/components/marketing/HowItWorks'
+import { TemplatesSection } from '@/components/marketing/TemplatesSection'
+import { PricingSection } from '@/components/marketing/PricingSection'
+import { FaqSection } from '@/components/marketing/FaqSection'
+import { ContactSection } from '@/components/marketing/ContactSection'
+import { FinalCta } from '@/components/marketing/FinalCta'
+import { SiteFooter } from '@/components/marketing/SiteFooter'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://misello.com.mx'
 
@@ -17,65 +21,13 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 }
 
-const HERO_SLIDES: HeroSlide[] = [
-  { src: '/hero/boda.jpg', alt: 'Novios el día de su boda — invitación digital de Sello' },
-  { src: '/hero/xv-anos.jpg', alt: 'Festejada de XV años — invitación digital de Sello' },
-  { src: '/hero/bautizo.jpg', alt: 'Bautizo — invitación digital de Sello' },
-  { src: '/hero/baby-shower.jpg', alt: 'Baby shower — invitación digital de Sello' },
-]
-
-const STEPS = [
-  {
-    n: '1',
-    title: 'Elige tu estilo',
-    body: 'Formal, moderna o cálida: cada plantilla ya luce impecable, tú solo eliges la que se sienta como tu evento.',
-  },
-  {
-    n: '2',
-    title: 'Cuenta tu historia',
-    body: 'Nombres, fecha, lugar, fotos y las palabras que quieras dedicar. Avanza a tu ritmo — si te vas a medio camino, todo sigue ahí cuando regreses.',
-  },
-  {
-    n: '3',
-    title: 'Comparte tu sello',
-    body: 'Un solo pago y tu invitación queda lista para mandar por WhatsApp.',
-  },
-]
-
-const INCLUYE = [
-  'Avanza a tu ritmo — cierra y retoma cuando quieras, nada se pierde',
-  'Vista previa idéntica a la invitación final, antes de pagar',
-  'Sabes quién confirma, al momento',
-  'Un enlace propio, listo para compartir por WhatsApp',
-  'Cambios ilimitados hasta la fecha de tu evento',
-  'Pago único, sin sorpresas ni renovaciones',
-]
-
-const FAQS = [
-  {
-    q: '¿Es una suscripción?',
-    a: 'No. Pago único por evento. Tu invitación queda activa hasta varios meses después de la fecha del evento, sin cobros recurrentes.',
-  },
-  {
-    q: '¿Mis invitados necesitan crear una cuenta para confirmar?',
-    a: 'No. El RSVP es público — entran a tu enlace, confirman asistencia en segundos, y tú recibes la notificación.',
-  },
-  {
-    q: '¿Puedo ver mi invitación antes de pagar?',
-    a: 'Sí. El preview usa exactamente el mismo diseño que verán tus invitados, con una marca de agua que desaparece al activarse.',
-  },
-  {
-    q: '¿Qué pasa cuando termina la vigencia?',
-    a: 'Te avisamos por correo antes de que expire. Tu invitación deja de ser pública pero no se borra de inmediato.',
-  },
-]
-
 /**
  * Datos estructurados (schema.org). Le dicen a Google qué es esta página en
  * lugar de que lo adivine del HTML:
  *  - FAQPage: es el que puede pintar las preguntas desplegables en el
- *    resultado de búsqueda. Se genera del mismo array FAQS que se renderiza,
- *    porque Google penaliza el marcado que no coincide con lo visible.
+ *    resultado de búsqueda. Se genera del mismo array FAQS que se renderiza
+ *    en FaqSection, porque Google penaliza el marcado que no coincide con lo
+ *    visible.
  *  - Organization / WebSite: identifican la marca.
  *  - Product: precio real de arranque, leído de la base igual que la página.
  */
@@ -127,22 +79,6 @@ function buildJsonLd(precioDesde: number | null) {
   return { '@context': 'https://schema.org', '@graph': grafo }
 }
 
-function PlusIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      aria-hidden
-    >
-      <path d="M10 3v14M3 10h14" />
-    </svg>
-  )
-}
-
 export default async function LandingPage() {
   const supabase = await createClient()
   const [{ data: allTemplates }, { data: userData }] = await Promise.all([
@@ -153,11 +89,12 @@ export default async function LandingPage() {
       .order('created_at', { ascending: true }),
     supabase.auth.getUser(),
   ])
-  const user = userData.user
+  // Un anónimo (borrador sin cuenta) se trata como visitante en la landing.
+  const user = userData.user?.is_anonymous ? null : userData.user
   const templates = (allTemplates ?? []).slice(0, 6)
 
   const desdeBoda = minPriceMXN(allTemplates ?? [], 'boda')
-  const otrasPrecios = ['xv_anos', 'bautizo', 'baby_shower', 'generico']
+  const otrasPrecios = ['xv_anos', 'bautizo', 'baby_shower', 'cumpleanos', 'generico']
     .map((c) => minPriceMXN(allTemplates ?? [], c))
     .filter((p): p is number => p !== null)
   const desdeOtras = otrasPrecios.length > 0 ? Math.min(...otrasPrecios) : null
@@ -182,260 +119,15 @@ export default async function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(precioDesde)) }}
       />
 
-      {/* NAV */}
-      <header className="absolute inset-x-0 top-0 z-20">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-6">
-          <Image src="/brand/sello-principal.png" alt="Sello" width={98} height={42} priority />
-          {user ? (
-            <AppMenu displayName={displayName} isAdmin={isAdmin} variant="dark" />
-          ) : (
-            <Link href="/login" className="font-body text-sm font-medium text-paper/85 hover:text-paper">
-              Entrar
-            </Link>
-          )}
-        </div>
-      </header>
-
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="relative h-[520px] sm:h-[620px]">
-          <RotatingHero slides={HERO_SLIDES} />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(28,27,27,.45) 0%, rgba(28,27,27,.06) 34%, rgba(28,27,27,.5) 76%, rgba(28,27,27,.72) 100%)',
-            }}
-          />
-          <div className="rise-in relative z-10 mx-auto flex h-full max-w-3xl flex-col justify-end gap-4 px-4 pb-16 sm:px-6 sm:pb-20">
-            <span className="font-body text-xs font-semibold tracking-[0.16em] text-paper/80 uppercase">
-              Bodas · XV años · Bautizos · Baby showers
-            </span>
-            <h1 className="max-w-lg text-4xl leading-[1.05] text-paper sm:text-6xl">
-              Tu invitación digital,
-              <br />
-              como la imaginaste
-            </h1>
-            <p className="max-w-md font-body text-base leading-relaxed text-paper/85 sm:text-lg">
-              Invitaciones digitales que se arman en minutos: contestas unas
-              preguntas y la tuya queda lista para compartir por WhatsApp.
-            </p>
-          </div>
-        </div>
-
-        {/* TARJETA DE VISTA PREVIA */}
-        <div className="relative z-10 mx-auto -mt-14 max-w-3xl px-4 sm:px-6">
-          <div className="rise-in flex flex-col gap-5 rounded-sm border border-ink/6 bg-paper p-6 shadow-[0_12px_40px_rgba(28,27,27,0.12)] sm:flex-row sm:items-center sm:justify-between sm:p-8">
-            <div className="flex items-center gap-4 sm:gap-5">
-              <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-[4px] border border-ink/6 sm:h-24 sm:w-[76px]">
-                <Image src="/hero/boda.jpg" alt="" fill sizes="76px" className="object-cover object-[50%_40%]" />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="font-display text-xl leading-none sm:text-2xl">
-                  Javier <span className="italic text-ink/50">&amp;</span> Nayeli
-                </span>
-                <span className="font-body text-sm text-ink/70">3 de octubre, 2026 · Mérida</span>
-                <div className="mt-1 flex gap-2">
-                  <span className="rounded-full bg-clay/15 px-2.5 py-1 font-body text-[10px] font-semibold text-clay">
-                    RSVP activo
-                  </span>
-                  <span className="rounded-full bg-ink/6 px-2.5 py-1 font-body text-[10px] font-semibold text-ink/60">
-                    javier-nayeli.misello.com.mx
-                  </span>
-                </div>
-              </div>
-            </div>
-            <Link
-              href="/crear"
-              className="shrink-0 rounded-sm bg-ink px-6 py-3.5 text-center font-body text-sm font-semibold text-paper transition-colors hover:bg-clay"
-            >
-              Crear mi invitación →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* COMO FUNCIONA */}
-      <section id="como-funciona" className="px-4 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <span className="font-body text-xs font-semibold tracking-[0.16em] text-ink/50 uppercase">
-            Cómo funciona
-          </span>
-          <h2 className="mt-3 max-w-lg font-display text-3xl sm:text-4xl">
-            Tres pasos para sellarlo.
-          </h2>
-
-          <div className="mt-14 grid gap-10 sm:grid-cols-3">
-            {STEPS.map((step) => (
-              <div key={step.n} className="flex gap-4">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/15 font-display text-sm">
-                  {step.n}
-                </span>
-                <div>
-                  <h3 className="font-display text-lg">{step.title}</h3>
-                  <p className="mt-1.5 font-body text-sm leading-relaxed text-ink/60">
-                    {step.body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PLANTILLAS */}
-      <section id="plantillas" className="border-t border-ink/6 bg-paper-2 px-4 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <span className="font-body text-xs font-semibold tracking-[0.16em] text-ink/50 uppercase">
-                Plantillas
-              </span>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl">Elige la que se parezca a tu evento.</h2>
-            </div>
-            <Link href="/plantillas" className="hidden shrink-0 font-body text-sm font-semibold text-clay hover:text-clay-light sm:block">
-              Ver todas →
-            </Link>
-          </div>
-
-          <div className="mt-12 flex gap-5 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:overflow-visible lg:grid-cols-4">
-            {(templates ?? []).map((template) => (
-              <TemplateCard
-                key={template.id}
-                name={template.name}
-                priceRange={formatMXN(template.price_mxn)}
-                templateId={template.id}
-                className="w-[150px] shrink-0 sm:w-auto"
-              />
-            ))}
-          </div>
-
-          <Link href="/plantillas" className="mt-8 block font-body text-sm font-semibold text-clay sm:hidden">
-            Ver todas →
-          </Link>
-        </div>
-      </section>
-
-      {/* PRECIO */}
-      <section id="precios" className="px-4 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-4xl">
-          <div className="flex flex-col gap-8 rounded-sm bg-ink p-8 text-paper sm:p-12">
-            <span className="font-body text-xs font-semibold tracking-[0.16em] text-paper/60 uppercase">
-              Precio
-            </span>
-            <div className="flex flex-wrap items-baseline gap-x-10 gap-y-6 border-b border-paper/10 pb-8">
-              {desdeBoda !== null && (
-                <div>
-                  <div className="font-display text-3xl">Desde {formatMXN(desdeBoda)}</div>
-                  <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                    Boda · MXN, pago único, IVA incluido
-                  </div>
-                </div>
-              )}
-              {desdeOtras !== null && (
-                <div>
-                  <div className="font-display text-3xl">Desde {formatMXN(desdeOtras)}</div>
-                  <div className="mt-1 font-body text-xs tracking-[0.14em] text-paper/60 uppercase">
-                    XV años, bautizos y más · IVA incluido
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {INCLUYE.map((item) => (
-                <div key={item} className="flex items-start gap-2.5 font-body text-sm leading-snug text-paper/85">
-                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-clay" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-            <Link
-              href="/crear"
-              className="self-start rounded-sm bg-clay px-7 py-3.5 font-body text-sm font-semibold text-ink transition-colors hover:bg-clay-light"
-            >
-              Crear mi invitación →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="border-t border-ink/6 px-4 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="font-display text-3xl sm:text-4xl">Antes de que preguntes.</h2>
-
-          <div className="mt-10 divide-y divide-ink/8">
-            {FAQS.map((f) => (
-              <details key={f.q} className="group py-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg">
-                  {f.q}
-                  <PlusIcon className="h-4 w-4 shrink-0 text-clay transition-transform group-open:rotate-45" />
-                </summary>
-                <p className="mt-3 font-body text-sm leading-relaxed text-ink/60">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* DUDAS / FEEDBACK */}
-      <section id="contacto" className="border-t border-ink/6 bg-paper-2 px-4 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-2xl">
-          <span className="font-body text-xs font-semibold tracking-[0.16em] text-ink/50 uppercase">
-            Contacto
-          </span>
-          <h2 className="mt-3 font-display text-3xl sm:text-4xl">¿Te quedó una duda?</h2>
-          <p className="mt-3 font-body text-base leading-relaxed text-ink/70">
-            Escríbenos y te contestamos. Si algo te gustaría que Sello hiciera y
-            todavía no lo hace, también queremos saberlo.
-          </p>
-
-          <div className="mt-8">
-            <FeedbackForm />
-          </div>
-
-          <p className="mt-6 font-body text-sm text-ink/50">
-            Si prefieres, escríbenos directo a{' '}
-            <a
-              href="mailto:hola@misello.com.mx"
-              className="text-clay transition-colors hover:text-clay-light"
-            >
-              hola@misello.com.mx
-            </a>
-            .
-          </p>
-        </div>
-      </section>
-
-      {/* CTA FINAL */}
-      <section className="border-t border-ink/6 px-4 py-20 text-center sm:px-6 sm:py-24">
-        <h2 className="mx-auto max-w-lg font-display text-3xl sm:text-4xl">Sella tu invitación hoy.</h2>
-        <Link
-          href="/crear"
-          className="mt-9 inline-block rounded-sm bg-ink px-8 py-4 font-body text-base font-semibold text-paper transition-colors hover:bg-clay"
-        >
-          Arma tu invitación →
-        </Link>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-ink/6 px-4 py-10 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 font-body text-xs text-ink/50 sm:flex-row">
-          <Image src="/brand/sello-una-tinta.png" alt="Sello" width={98} height={42} />
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <span>Instagram</span>
-            <span>WhatsApp</span>
-            <a href="#contacto" className="transition-colors hover:text-ink">
-              Contacto
-            </a>
-            <Link href="/privacidad" className="transition-colors hover:text-ink">
-              Aviso de privacidad
-            </Link>
-            <span>Términos</span>
-          </div>
-          <span>© {new Date().getFullYear()} Sello</span>
-        </div>
-      </footer>
+      <SiteHeader hasUser={!!user} displayName={displayName} isAdmin={isAdmin} />
+      <Hero />
+      <HowItWorks />
+      <TemplatesSection templates={templates} />
+      <PricingSection desdeBoda={desdeBoda} desdeOtras={desdeOtras} />
+      <FaqSection />
+      <ContactSection />
+      <FinalCta />
+      <SiteFooter />
     </div>
   )
 }

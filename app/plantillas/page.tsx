@@ -12,8 +12,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-const COMING_SOON = ['Genérico']
-
 export default async function PlantillasPage() {
   const supabase = await createClient()
 
@@ -21,7 +19,7 @@ export default async function PlantillasPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     redirect('/login?next=/plantillas')
   }
 
@@ -66,10 +64,6 @@ export default async function PlantillasPage() {
               priceRange={formatMXN(template.price_mxn)}
               templateId={template.id}
             />
-          ))}
-
-          {COMING_SOON.map((name) => (
-            <TemplateCard key={name} name={name} priceRange="" comingSoon />
           ))}
         </div>
       </div>

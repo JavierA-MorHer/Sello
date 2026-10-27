@@ -14,7 +14,7 @@ export default async function CrearEntryPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     redirect('/login?next=/crear')
   }
 

@@ -22,8 +22,9 @@ export default async function PreviewPage({
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Anónimos también ven el preview; sin ninguna sesión, /crear arranca una.
   if (!user) {
-    redirect(`/login?next=${encodeURIComponent(`/crear/${templateId}/preview`)}`)
+    redirect(`/crear/${templateId}`)
   }
 
   const { data: template } = await supabase
@@ -66,7 +67,7 @@ export default async function PreviewPage({
     <div className="min-h-screen bg-paper">
       <div className="sticky top-0 z-30 flex items-center justify-between bg-ink px-4 py-3.5 sm:px-6">
         <div className="flex items-center gap-1">
-          <AppMenu variant="dark" />
+          <AppMenu variant="dark" isAnonymous={!!user.is_anonymous} />
           <Link
             href={editHref}
             className="font-body text-sm font-semibold text-paper/85 transition-colors hover:text-paper"

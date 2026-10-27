@@ -38,6 +38,10 @@ export function buildEventMetadataCopy(
       const nombre = str('nombre_bebe')
       return { title: nombre ? `Baby Shower de ${nombre}` : 'Baby Shower', description }
     }
+    case 'Cumpleanos': {
+      const nombre = str('nombre_festejado')
+      return { title: nombre ? `Cumpleaños de ${nombre}` : 'Cumpleaños', description }
+    }
     default:
       return { title: 'Estás invitado', description }
   }
