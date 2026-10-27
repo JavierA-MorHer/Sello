@@ -1,4 +1,5 @@
 import type { WeddingData } from '@/components/templates/wedding.types'
+import type { SaveTheDateData } from '@/components/templates/boda-save-the-date.types'
 import type { XvAnosData } from '@/components/templates/xvanos.types'
 import type { BautizoData } from '@/components/templates/bautizo.types'
 import type { BabyShowerData } from '@/components/templates/babyshower.types'
@@ -46,6 +47,55 @@ export const DEMO_DATA: Record<string, { custom_data: Record<string, unknown>; f
       mensaje_rsvp: 'Por favor confirma antes del 15 de octubre para poder organizar todo con cariño.',
     } satisfies WeddingData,
     fotos: Array(6).fill('/demo/boda-placeholder.jpg'),
+  },
+  BodaSaveTheDate: {
+    custom_data: {
+      tema: 'salvia',
+      portada: 'tipografica',
+      // Sin sobre en el demo: el thumbnail del catálogo (/demo?bare=1) mostraría
+      // solo el sello en vez de la portada.
+      sobre: 'no',
+      cuenta_regresiva: 'si',
+      nombre_novia: 'Camila',
+      nombre_novio: 'Sebastián',
+      fecha_evento: '2027-05-15',
+      ciudad: 'San Miguel de Allende',
+      mensaje_calendario: 'Nos casamos y queremos que estés ahí. Aparta el día; los detalles vienen pronto.',
+      hora_ceremonia: '17:00',
+      ceremonia_ubicacion: {
+        lugar: 'Parroquia de San Miguel Arcángel',
+        direccion: 'Principal s/n, Zona Centro, San Miguel de Allende',
+        lat: 20.9144,
+        lng: -100.7452,
+        place_id: '',
+      },
+      hora_recepcion: '19:30',
+      recepcion_ubicacion: {
+        lugar: 'Hacienda Los Laureles',
+        direccion: 'Camino a Atotonilco km 4, San Miguel de Allende',
+        lat: 20.9144,
+        lng: -100.7452,
+        place_id: '',
+      },
+      itinerario: [
+        { hora: '17:00', titulo: 'Ceremonia religiosa' },
+        { hora: '19:30', titulo: 'Cóctel de bienvenida' },
+        { hora: '20:30', titulo: 'Entrada de los novios y cena' },
+        { hora: '22:00', titulo: 'Primer baile y brindis' },
+        { hora: '22:30', titulo: 'Fiesta' },
+      ],
+      vestimenta: 'Formal',
+      vestimenta_nota: 'Vestido largo o de coctel y traje oscuro. Te pedimos reservar el blanco para la novia.',
+      tiendas: [
+        { nombre: 'Liverpool', detalle: 'Evento 51234567', url: '#' },
+        { nombre: 'Amazon', detalle: 'Lista de bodas', url: '#' },
+      ],
+      transferencia_banco: 'BBVA',
+      transferencia_clabe: '012180001234567890',
+      pases_por_invitacion: 2,
+      fecha_limite_rsvp: '2027-04-15',
+    } satisfies SaveTheDateData,
+    fotos: Array(3).fill('/demo/boda-save-the-date.jpg'),
   },
   XvAnos: {
     custom_data: {

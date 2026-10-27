@@ -20,7 +20,8 @@ export function buildEventMetadataCopy(
   const str = (key: string) => (typeof customData[key] === 'string' ? (customData[key] as string) : undefined)
 
   switch (componentKey) {
-    case 'BodaClasica': {
+    case 'BodaClasica':
+    case 'BodaSaveTheDate': {
       const novia = str('nombre_novia')
       const novio = str('nombre_novio')
       return { title: novia && novio ? `Boda de ${novia} & ${novio}` : 'Nos casamos', description }

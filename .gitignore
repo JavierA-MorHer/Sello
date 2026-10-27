@@ -42,3 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# handoffs de diseño: referencia HTML del prototipo, no código de producción
+/design_handoff_*/
