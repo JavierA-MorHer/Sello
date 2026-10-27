@@ -1,0 +1,5 @@
+node_modules/
+out/
+# Grabaciones generadas por tools/capturar-plantilla.mjs: se regeneran desde
+# la app, no hace falta versionar los mp4.
+public/screens/*.mp4

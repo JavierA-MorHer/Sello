@@ -1,0 +1,57 @@
+[
+  {
+    "text": "Si",
+    "startMs": 0,
+    "endMs": 220
+  },
+  {
+    "text": "vas",
+    "startMs": 220,
+    "endMs": 420
+  },
+  {
+    "text": "a",
+    "startMs": 420,
+    "endMs": 520
+  },
+  {
+    "text": "gastar",
+    "startMs": 520,
+    "endMs": 900
+  },
+  {
+    "text": "en",
+    "startMs": 900,
+    "endMs": 1050
+  },
+  {
+    "text": "invitaciones",
+    "startMs": 1050,
+    "endMs": 1600
+  },
+  {
+    "text": "de",
+    "startMs": 1600,
+    "endMs": 1720
+  },
+  {
+    "text": "papel,",
+    "startMs": 1720,
+    "endMs": 2150
+  },
+  {
+    "text": "mira",
+    "startMs": 2150,
+    "endMs": 2450
+  },
+  {
+    "text": "esto",
+    "startMs": 2450,
+    "endMs": 2750
+  },
+  {
+    "text": "primero.",
+    "startMs": 2750,
+    "endMs": 3300
+  }
+]
