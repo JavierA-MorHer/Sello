@@ -1,0 +1,4 @@
+Pon aquí tus grabaciones de pantalla reales (vertical, 1080x2340 o similar, .mp4).
+Nombre por defecto que usa <Phone>: plantilla.mp4
+Sugeridas: plantilla.mp4 (cumpleaños o XV), rsvp.mp4 (flujo de confirmación), whatsapp.mp4 (link abierto desde chat).
+Graba a 60 fps si puedes, scroll lento y constante, sin notificaciones.

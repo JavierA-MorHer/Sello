@@ -1,0 +1,2 @@
+Pon aquí musica.mp3 (piano / cuerdas / lo-fi cálido, 80–100 BPM, libre de derechos) y voz.mp3 si usas voz en off.
+Activa la música con la prop music=true en la composición Reel.

@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { BodaClasica } from '@/components/templates/boda/BodaClasica'
+import { BodaSaveTheDate } from '@/components/templates/boda/BodaSaveTheDate'
 import { XvAnos } from '@/components/templates/xv-anos/XvAnos'
 import { Bautizo } from '@/components/templates/bautizo/Bautizo'
 import { BabyShower } from '@/components/templates/baby-shower/BabyShower'
@@ -22,6 +23,7 @@ export type EventTemplateProps = {
 /** Mapea `templates.component_key` al componente "tonto" que renderiza esa plantilla. */
 export const TEMPLATE_COMPONENTS: Record<string, ComponentType<EventTemplateProps>> = {
   BodaClasica: BodaClasica as unknown as ComponentType<EventTemplateProps>,
+  BodaSaveTheDate: BodaSaveTheDate as unknown as ComponentType<EventTemplateProps>,
   XvAnos: XvAnos as unknown as ComponentType<EventTemplateProps>,
   Bautizo: Bautizo as unknown as ComponentType<EventTemplateProps>,
   BabyShower: BabyShower as unknown as ComponentType<EventTemplateProps>,
